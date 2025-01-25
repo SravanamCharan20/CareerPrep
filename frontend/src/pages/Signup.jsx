@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { Mail, Lock } from "lucide-react";
+import { User, Mail, Lock } from "lucide-react";
 
-const Signin = () => {
+const Signup = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <motion.div
@@ -14,9 +14,19 @@ const Signin = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-indigo-100 opacity-20 rounded-2xl pointer-events-none"></div>
 
         <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-[#7F56D9] to-[#2c0e88] bg-clip-text text-transparent">
-          Welcome Back
+          Create an Account
         </h2>
         <form className="space-y-4">
+          {/* Full Name Field */}
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Full Name"
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-indigo-200 focus:outline-none"
+            />
+          </div>
+
           {/* Email Field */}
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -37,16 +47,16 @@ const Signin = () => {
             />
           </div>
 
-          {/* Sign In Button */}
+          {/* Sign Up Button */}
           <button
             type="submit"
             className="w-full py-2 text-white bg-black rounded-lg hover:bg-gray-800 focus:outline-none"
           >
-            Sign In
+            Sign Up
           </button>
         </form>
 
-        {/* Google Sign In Button */}
+        {/* Google Sign Up Button */}
         <div className="text-center mt-4">
           <button className="w-full p-2 border border-gray-300 flex items-center justify-center rounded-lg hover:bg-gray-100">
             <svg
@@ -79,4 +89,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default Signup;

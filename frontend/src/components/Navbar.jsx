@@ -1,122 +1,113 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { motion } from "framer-motion";
 
-export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+// ArrowRight Icon Component
+const ArrowRight = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+    <polyline points="12 5 19 12 12 19"></polyline>
+  </svg>
+);
+
+// NavItem Component
+// eslint-disable-next-line react/prop-types
+const NavItem = ({ href, children }) => (
+  <motion.li className="relative" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+    <Link to={href} className="text-gray-700 hover:text-black transition-colors duration-300">
+      {children}
+    </Link>
+    <motion.div
+      className="absolute bottom-0 left-0 w-full h-0.5 bg-black"
+      initial={{ scaleX: 0 }}
+      whileHover={{ scaleX: 1 }}
+      transition={{ duration: 0.2 }}
+    />
+  </motion.li>
+);
+
+// Button Component
+// eslint-disable-next-line react/prop-types
+const Button = ({ children, primary = false, icon = null }) => (
+  <motion.button
+    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center ${
+      primary ? "bg-black text-white hover:bg-gray-800" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+    }`}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+  >
+    {children}
+    {icon && (
+      <motion.span
+        className="ml-2"
+        initial={{ x: 0 }}
+        animate={{ x: [0, 5, 0] }}
+        transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5, ease: "easeInOut" }}
+      >
+        {typeof icon === "function" ? icon() : icon}
+      </motion.span>
+    )}
+  </motion.button>
+);
+
+// Navbar Component
+const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
-    <nav className="w-full bg-gradient-to-r from-[#7F56D9] to-[#2c0e88] shadow-md">
-      <div className="max-w-[1200px] mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <div className="bg-white p-2 rounded-full">
-            <div className="w-8 h-8 bg-gradient-to-r from-[#7F56D9] to-[#2c0e88] rounded-full" />
+    <motion.nav
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-transparent"
+      }`}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <Link to="/" className="text-3xl font-bold text-black">
+              Career<Link to="/" className="bg-gradient-to-r from-[#7F56D9] to-[#2c0e88] bg-clip-text text-transparent">Prep</Link>
+            </Link>
+            <ul className="ml-32 flex items-center space-x-8">
+              <NavItem href="/resumes">Resumes</NavItem>
+              <NavItem href="/hackathons">Hackathons</NavItem>
+              <NavItem href="/career-paths">Career Paths</NavItem>
+              <NavItem href="/projects">Projects</NavItem>
+            </ul>
           </div>
-          <Link
-            to="/"
-            className="text-2xl font-extrabold text-white tracking-tight"
-          >
-            Career<span className="text-slate-900">Prep</span>
-          </Link>
-        </div>
-
-        {/* Desktop Links */}
-        <div className="hidden md:flex space-x-6">
-          <Link
-            to="/resume"
-            className="text-sm text-white font-medium hover:text-gray-200 transition"
-          >
-            Resume
-          </Link>
-          <Link
-            to="/hackathons"
-            className="text-sm text-white font-medium hover:text-gray-200 transition"
-          >
-            Hackathons
-          </Link>
-          <Link
-            to="/career-paths"
-            className="text-sm text-white font-medium hover:text-gray-200 transition"
-          >
-            Career Paths
-          </Link>
-          <Link
-            to="/projects"
-            className="text-sm text-white font-medium hover:text-gray-200 transition"
-          >
-            Projects
-          </Link>
-        </div>
-
-        {/* Buttons */}
-        <div className="hidden md:flex space-x-4">
-          <Link
-            to="/signin"
-            className="text-sm text-white border border-white px-4 py-2 rounded-full hover:bg-white hover:text-[#7F56D9] transition"
-          >
-            Log In
-          </Link>
-          <Link
-            to="/signup"
-            className="text-sm bg-white text-[#7F56D9] px-4 py-2 rounded-full hover:opacity-90 transition"
-          >
-            Sign Up
-          </Link>
-        </div>
-
-        {/* Mobile Menu Button -> 238772770924-2iq3n59466p0gkktjc09msh87r09onot.apps.googleusercontent.com */ }
-        <button
-          className="md:hidden p-2 text-white"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-gradient-to-r from-[#7F56D9] to-[#2c0e88] shadow-lg">
-          <div className="flex flex-col space-y-4 px-6 py-4">
-            <Link
-              to="/resume"
-              className="text-sm text-white font-medium hover:text-gray-200 transition"
-            >
-              Resume
-            </Link>
-            <Link
-              to="/hackathons"
-              className="text-sm text-white font-medium hover:text-gray-200 transition"
-            >
-              Hackathons
-            </Link>
-            <Link
-              to="/career-paths"
-              className="text-sm text-white font-medium hover:text-gray-200 transition"
-            >
-              Career Paths
-            </Link>
-            <Link
-              to="/projects"
-              className="text-sm text-white font-medium hover:text-gray-200 transition"
-            >
-              Projects
-            </Link>
-            <Link
-              to="/signin"
-              className="text-sm text-white border border-white px-4 py-2 rounded-full hover:bg-white hover:text-[#7F56D9] transition text-center"
-            >
-              Log In
-            </Link>
-            <Link
-              to="/signup"
-              className="text-sm bg-white text-[#7F56D9] px-4 py-2 rounded-full hover:opacity-90 transition text-center"
-            >
+          <div className="flex items-center space-x-4">
+            <Link to='/signin'><Button>Log In</Button></Link>
+            <Link to='/signup'>
+            <Button primary icon={ArrowRight}>
               Sign Up
+            </Button>
             </Link>
           </div>
         </div>
-      )}
-    </nav>
+      </div>
+    </motion.nav>
   );
-}
+};
+
+export default Navbar;
