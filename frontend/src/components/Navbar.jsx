@@ -22,9 +22,6 @@ const NavItem = ({ href, children }) => (
   </motion.li>
 );
 
-// Button Component
-// eslint-disable-next-line react/prop-types
-
 // Navbar Component
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
