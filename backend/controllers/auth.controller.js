@@ -50,11 +50,11 @@ export const signin = async (req, res, next) => {
       { expiresIn: '1h' }
     );
 
-    res.status(200).json({
+    res.cookie('access_token', token, { httpOnly: true }).status(200).json({
       _id: user._id,
       username: user.username,
       email: user.email,
-      token
+      timestamp: new Date().getTime(),
     });
   } catch (error) {
     next(error);
