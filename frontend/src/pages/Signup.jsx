@@ -1,8 +1,33 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { User, Mail, Lock } from "lucide-react";
+import {useState} from 'react'
 
 const Signup = () => {
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+  console.log(formData)
+  const handlesubmit = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/auth/signup',{
+      method: 'POST',
+      headers:{
+        'Content-Type':'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
+    const data = await res.json()
+    console.log(data)
+  }
+
+
   return (
     <div className="min-h-screen bg-black text-white pt-32 px-6">
       <div className="max-w-[380px] mx-auto">
@@ -20,6 +45,7 @@ const Signup = () => {
 
         <motion.form 
           className="space-y-6"
+          onSubmit={handlesubmit}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -32,7 +58,9 @@ const Signup = () => {
               <input
                 type="text"
                 placeholder="Full Name"
+                id="username"
                 className="w-full pl-10 pr-4 py-3 bg-[#1d1d1f] rounded-lg border border-[#424245] text-white placeholder-gray-500 focus:outline-none focus:border-[#2997ff] transition-colors"
+                onChange={handleChange}
               />
             </div>
             <div className="relative">
@@ -42,7 +70,9 @@ const Signup = () => {
               <input
                 type="email"
                 placeholder="Email"
+                id="email"
                 className="w-full pl-10 pr-4 py-3 bg-[#1d1d1f] rounded-lg border border-[#424245] text-white placeholder-gray-500 focus:outline-none focus:border-[#2997ff] transition-colors"
+                onChange={handleChange}
               />
             </div>
             <div className="relative">
@@ -52,7 +82,9 @@ const Signup = () => {
               <input
                 type="password"
                 placeholder="Password"
+                id="password"
                 className="w-full pl-10 pr-4 py-3 bg-[#1d1d1f] rounded-lg border border-[#424245] text-white placeholder-gray-500 focus:outline-none focus:border-[#2997ff] transition-colors"
+                onChange={handleChange}
               />
             </div>
           </div>
