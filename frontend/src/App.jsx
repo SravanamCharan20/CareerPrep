@@ -8,7 +8,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Navbar />
-      <div className="pt-16"> 
+      <div className=""> 
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/signin" element={<Signin />} />

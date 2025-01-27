@@ -1,111 +1,136 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Search, Menu, X } from "lucide-react";
 
 // ArrowRight Icon Component
-const ArrowRight = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <line x1="5" y1="12" x2="19" y2="12"></line>
-    <polyline points="12 5 19 12 12 19"></polyline>
-  </svg>
-);
 
 // NavItem Component
 // eslint-disable-next-line react/prop-types
 const NavItem = ({ href, children }) => (
-  <motion.li className="relative" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-    <Link to={href} className="text-gray-700 hover:text-black transition-colors duration-300">
+  <motion.li 
+    className="relative" 
+    whileHover={{ opacity: 0.65 }}
+    transition={{ duration: 0.2 }}
+  >
+    <Link 
+      to={href} 
+      className="text-sm font-medium text-gray-300 hover:text-white transition-colors duration-200"
+    >
       {children}
     </Link>
-    <motion.div
-      className="absolute bottom-0 left-0 w-full h-0.5 bg-black"
-      initial={{ scaleX: 0 }}
-      whileHover={{ scaleX: 1 }}
-      transition={{ duration: 0.2 }}
-    />
   </motion.li>
 );
 
 // Button Component
 // eslint-disable-next-line react/prop-types
-const Button = ({ children, primary = false, icon = null }) => (
-  <motion.button
-    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-300 flex items-center ${
-      primary ? "bg-black text-white hover:bg-gray-800" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-    }`}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-  >
-    {children}
-    {icon && (
-      <motion.span
-        className="ml-2"
-        initial={{ x: 0 }}
-        animate={{ x: [0, 5, 0] }}
-        transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5, ease: "easeInOut" }}
-      >
-        {typeof icon === "function" ? icon() : icon}
-      </motion.span>
-    )}
-  </motion.button>
-);
 
 // Navbar Component
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <motion.nav
       className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white/80 backdrop-blur-md shadow-sm" : "bg-transparent"
+        isScrolled ? "bg-black/90 backdrop-blur-md" : "bg-black/80"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Link to="/" className="text-3xl font-bold text-black">
-              Career<Link to="/" className="bg-gradient-to-r from-[#7F56D9] to-[#2c0e88] bg-clip-text text-transparent">Prep</Link>
+      <div className="max-w-[1024px] mx-auto px-4">
+        <div className="flex items-center justify-between h-12">
+          {/* Logo */}
+          <Link to="/" className="text-xl font-semibold text-white">
+            CareerPrep
+          </Link>
+
+          {/* Desktop Navigation */}
+          <ul className="hidden md:flex items-center space-x-8">
+            <NavItem href="/projects">Projects</NavItem>
+            <NavItem href="/hackathons">Hackathons</NavItem>
+            <NavItem href="/mentors">CareerPaths</NavItem>
+            <NavItem href="/resources">Resources</NavItem>
+          </ul>
+
+          {/* Right Section */}
+          <div className="hidden md:flex items-center space-x-6">
+            <button className="text-gray-300 hover:text-white">
+              <Search className="w-5 h-5" />
+            </button>
+            <Link to="/signin">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="text-gray-300 hover:text-white text-sm font-medium"
+              >
+                Sign in
+              </motion.button>
             </Link>
-            <ul className="ml-32 flex items-center space-x-8">
-              <NavItem href="/resumes">Resumes</NavItem>
-              <NavItem href="/hackathons">Hackathons</NavItem>
-              <NavItem href="/career-paths">Career Paths</NavItem>
-              <NavItem href="/projects">Projects</NavItem>
-            </ul>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link to='/signin'><Button>Log In</Button></Link>
-            <Link to='/signup'>
-            <Button primary icon={ArrowRight}>
-              Sign Up
-            </Button>
+            <Link to="/signup">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-4 py-1.5 bg-[#2997ff] text-white rounded-full text-sm font-medium hover:bg-[#2997ff]/90 transition-colors"
+              >
+                Get Started
+              </motion.button>
             </Link>
           </div>
+
+          {/* Mobile Menu Button */}
+          <button 
+            className="md:hidden text-gray-300 hover:text-white"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <motion.div 
+          className="md:hidden bg-black/95 backdrop-blur-md"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+        >
+          <div className="px-4 py-6 space-y-4">
+            <Link to="/projects" className="block text-gray-300 hover:text-white py-2">
+              Projects
+            </Link>
+            <Link to="/hackathons" className="block text-gray-300 hover:text-white py-2">
+              Hackathons
+            </Link>
+            <Link to="/mentors" className="block text-gray-300 hover:text-white py-2">
+              Mentors
+            </Link>
+            <Link to="/resources" className="block text-gray-300 hover:text-white py-2">
+              Resources
+            </Link>
+            <div className="pt-4 border-t border-gray-800">
+              <Link to="/signin" className="block text-gray-300 hover:text-white py-2">
+                Sign in
+              </Link>
+              <Link to="/signup">
+                <button className="mt-2 w-full px-4 py-2 bg-[#2997ff] text-white rounded-full text-sm font-medium hover:bg-[#2997ff]/90 transition-colors">
+                  Get Started
+                </button>
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+      )}
     </motion.nav>
   );
 };
