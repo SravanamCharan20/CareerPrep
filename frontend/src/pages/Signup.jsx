@@ -1,32 +1,55 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Lock } from "lucide-react";
-import {useState} from 'react'
+import { useState } from "react";
 
 const Signup = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // Track error messages
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
+    username: "",
+    email: "",
+    password: "",
   });
 
+  // Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
-  console.log(formData)
+
+  // Handle form submission
   const handlesubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch('/api/auth/signup',{
-      method: 'POST',
-      headers:{
-        'Content-Type':'application/json',
-      },
-      body: JSON.stringify(formData)
-    });
-    const data = await res.json()
-    console.log(data)
-  }
+    setError(null); // Reset error before making a request
+    try {
+      setLoading(true);
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
+      // Check response status
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to sign up.");
+      }
+
+      const data = await res.json();
+      console.log("Signup successful:", data);
+
+      // Redirect to the signin page
+      navigate("/signin");
+    } catch (err) {
+      console.error("Error during signup:", err.message);
+      setError(err.message); // Display error to the user
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white pt-32 px-6">
@@ -38,12 +61,10 @@ const Signup = () => {
           className="text-center mb-12"
         >
           <h1 className="text-4xl font-semibold mb-3">Create Account</h1>
-          <p className="text-gray-400">
-            Join CareerPrep to start your journey
-          </p>
+          <p className="text-gray-400">Join CareerPrep to start your journey</p>
         </motion.div>
 
-        <motion.form 
+        <motion.form
           className="space-y-6"
           onSubmit={handlesubmit}
           initial={{ opacity: 0 }}
@@ -89,12 +110,17 @@ const Signup = () => {
             </div>
           </div>
 
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full py-3 bg-[#2997ff] text-white rounded-lg font-medium hover:bg-[#2997ff]/90 transition-colors"
+            disabled={loading}
           >
-            Create Account
+            {loading ? "Creating Account..." : "Create Account"}
           </motion.button>
 
           <div className="relative my-8">
@@ -111,25 +137,31 @@ const Signup = () => {
             whileTap={{ scale: 0.98 }}
             className="w-full py-3 border border-[#424245] rounded-lg text-white hover:border-[#2997ff] transition-colors flex items-center justify-center space-x-2"
           >
-            <img src="/google.svg" alt="Google" className="w-5 h-5" />
+            <img src="../../public/images/google-logo.webp" alt="Google" className="w-5 h-5" />
             <span>Continue with Google</span>
           </motion.button>
 
           <div className="text-sm text-gray-400 text-center mt-6">
-            By creating an account, you agree to our{' '}
-            <Link to="/terms" className="text-[#2997ff] hover:text-[#2997ff]/80 transition-colors">
+            By creating an account, you agree to our{" "}
+            <Link
+              to="/terms"
+              className="text-[#2997ff] hover:text-[#2997ff]/80 transition-colors"
+            >
               Terms of Service
-            </Link>{' '}
-            and{' '}
-            <Link to="/privacy" className="text-[#2997ff] hover:text-[#2997ff]/80 transition-colors">
+            </Link>{" "}
+            and{" "}
+            <Link
+              to="/privacy"
+              className="text-[#2997ff] hover:text-[#2997ff]/80 transition-colors"
+            >
               Privacy Policy
             </Link>
           </div>
 
           <p className="text-center text-gray-400 mt-8">
-            Already have an account?{' '}
-            <Link 
-              to="/signin" 
+            Already have an account?{" "}
+            <Link
+              to="/signin"
               className="text-[#2997ff] hover:text-[#2997ff]/80 transition-colors"
             >
               Sign in

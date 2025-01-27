@@ -1,8 +1,55 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
+import { useState } from "react";
 
 const Signin = () => {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // For displaying error messages
+  const navigate = useNavigate();
+
+  // Handle input changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null); // Reset error before submitting
+    try {
+      setLoading(true);
+      const res = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      // Check if the response is successful
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Login failed. Please try again.");
+      }
+
+      const data = await res.json();
+      console.log("Signin successful:", data);
+
+      // Redirect to dashboard or homepage
+      navigate("/");
+    } catch (err) {
+      console.error("Error during signin:", err.message);
+      setError(err.message); // Display error message
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white pt-32 px-6">
       <div className="max-w-[380px] mx-auto">
@@ -13,13 +60,12 @@ const Signin = () => {
           className="text-center mb-12"
         >
           <h1 className="text-4xl font-semibold mb-3">Sign in to CareerPrep</h1>
-          <p className="text-gray-400">
-            Use your CareerPrep Account
-          </p>
+          <p className="text-gray-400">Use your CareerPrep Account</p>
         </motion.div>
 
-        <motion.form 
+        <motion.form
           className="space-y-6"
+          onSubmit={handleSubmit}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}
@@ -32,7 +78,11 @@ const Signin = () => {
               <input
                 type="email"
                 placeholder="Email"
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
                 className="w-full pl-10 pr-4 py-3 bg-[#1d1d1f] rounded-lg border border-[#424245] text-white placeholder-gray-500 focus:outline-none focus:border-[#2997ff] transition-colors"
+                required
               />
             </div>
             <div className="relative">
@@ -42,13 +92,17 @@ const Signin = () => {
               <input
                 type="password"
                 placeholder="Password"
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
                 className="w-full pl-10 pr-4 py-3 bg-[#1d1d1f] rounded-lg border border-[#424245] text-white placeholder-gray-500 focus:outline-none focus:border-[#2997ff] transition-colors"
+                required
               />
             </div>
           </div>
 
           <div className="text-right">
-            <Link 
+            <Link
               to="/forgot-password"
               className="text-[#2997ff] hover:text-[#2997ff]/80 text-sm transition-colors"
             >
@@ -56,12 +110,17 @@ const Signin = () => {
             </Link>
           </div>
 
+          {error && (
+            <div className="text-red-500 text-sm text-center mt-2">{error}</div>
+          )}
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="w-full py-3 bg-[#2997ff] text-white rounded-lg font-medium hover:bg-[#2997ff]/90 transition-colors"
+            disabled={loading}
           >
-            Continue
+            {loading ? "Signing in..." : "Continue"}
           </motion.button>
 
           <div className="relative my-8">
@@ -78,14 +137,14 @@ const Signin = () => {
             whileTap={{ scale: 0.98 }}
             className="w-full py-3 border border-[#424245] rounded-lg text-white hover:border-[#2997ff] transition-colors flex items-center justify-center space-x-2"
           >
-            <img src="/google.svg" alt="Google" className="w-5 h-5" />
+            <img src="../../public/images/google-logo.webp" alt="Google" className="w-5 h-5" />
             <span>Continue with Google</span>
           </motion.button>
 
           <p className="text-center text-gray-400 mt-8">
-            New to CareerPrep?{' '}
-            <Link 
-              to="/signup" 
+            New to CareerPrep?{" "}
+            <Link
+              to="/signup"
               className="text-[#2997ff] hover:text-[#2997ff]/80 transition-colors"
             >
               Create Account
