@@ -5,6 +5,7 @@ import userRoute from "./routes/user.route.js";
 import authRoute from "./routes/auth.route.js";
 import cronJob from './utils/cronJob.js'; 
 import hackathonRoute from './routes/scrap.route.js';
+import projectsRoute from './routes/scrap.route.js';
 
 dotenv.config();
 
@@ -20,6 +21,8 @@ app.get('/test', (req, res) => {
 app.use('/api/users', userRoute);
 app.use('/api/auth', authRoute);
 app.use('/api/hackathons', hackathonRoute);
+app.use('/api/projects', projectsRoute);
+
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
