@@ -42,7 +42,7 @@ const runPythonMLScript = () => {
 // runPythonScript();
 
 const cronJob = () => {
-    cron.schedule('0 * * * *', () => {
+    cron.schedule('0 0 * * *', () => {
         console.log('Running Python script to fetch hackathons...');
         runPythonScript();
         runPythonMLScript();

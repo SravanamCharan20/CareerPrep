@@ -5,7 +5,9 @@ import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import Roadmap from "./pages/Roadmap";
 import HackathonsPage from "./pages/HackathonsPage";
+import MernProjects from "./pages/MernProjects";
 import Projects from "./pages/Projects";
+import MLProjects from "./pages/MLProjects";
 
 export default function App() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
           <Route path="/roadmaps" element={<Roadmap />} />
           <Route path="/hackathons" element={<HackathonsPage />} />
           <Route path="/projects" element={<Projects />} />
+          <Route path="/mlprojects" element={<MLProjects />} />
+          <Route path="/mernprojects" element={<MernProjects />} />
         </Routes>
       </div>
     </BrowserRouter>
