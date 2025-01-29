@@ -344,7 +344,7 @@ const CareerPaths = () => {
                   <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
                     <h3 className="text-lg font-semibold mb-4">Job Roles You Can Expect</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {selectedPath.jobRoles.map((role) => (
+                      {(selectedPath.jobRoles || []).map((role) => (
                         <div 
                           key={role}
                           className="p-3 rounded-xl bg-[#2c2c2e] text-gray-300"
@@ -363,7 +363,7 @@ const CareerPaths = () => {
                     </div>
                     <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
                       <h3 className="text-lg font-semibold mb-2">Starting Salary</h3>
-                      <p className="text-2xl text-green-500">{selectedPath.salary.entry}</p>
+                      <p className="text-2xl text-green-500">{selectedPath.salary?.entry || 'N/A'}</p>
                     </div>
                     <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
                       <h3 className="text-lg font-semibold mb-2">Competition</h3>
@@ -377,27 +377,32 @@ const CareerPaths = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                       <div className="p-4 rounded-xl bg-[#2c2c2e]">
                         <div className="text-sm text-gray-400 mb-1">Entry Level</div>
-                        <div className="text-xl text-green-500">{selectedPath.salary.entry}</div>
+                        <div className="text-xl text-green-500">{selectedPath.salary?.entry || 'N/A'}</div>
                       </div>
                       <div className="p-4 rounded-xl bg-[#2c2c2e]">
                         <div className="text-sm text-gray-400 mb-1">Mid Level</div>
-                        <div className="text-xl text-green-500">{selectedPath.salary.mid}</div>
+                        <div className="text-xl text-green-500">{selectedPath.salary?.mid || 'N/A'}</div>
                       </div>
                       <div className="p-4 rounded-xl bg-[#2c2c2e]">
                         <div className="text-sm text-gray-400 mb-1">Senior Level</div>
-                        <div className="text-xl text-green-500">{selectedPath.salary.senior}</div>
+                        <div className="text-xl text-green-500">{selectedPath.salary?.senior || 'N/A'}</div>
                       </div>
                     </div>
 
-                    <h4 className="text-sm font-medium text-gray-400 mb-4">Regional Variations</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {Object.entries(selectedPath.salary.regions).map(([region, level]) => (
-                        <div key={region} className="p-3 rounded-xl bg-[#2c2c2e]">
-                          <div className="text-sm text-gray-400">{region}</div>
-                          <div className="text-sm text-[#2997ff]">{level}</div>
+                    {/* Only render regional variations if they exist */}
+                    {selectedPath.salary?.regions && Object.keys(selectedPath.salary.regions).length > 0 && (
+                      <>
+                        <h4 className="text-sm font-medium text-gray-400 mb-4">Regional Variations</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          {Object.entries(selectedPath.salary.regions).map(([region, level]) => (
+                            <div key={region} className="p-3 rounded-xl bg-[#2c2c2e]">
+                              <div className="text-sm text-gray-400">{region}</div>
+                              <div className="text-sm text-[#2997ff]">{level}</div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </>
+                    )}
                   </div>
 
                   {/* Skills & Tools */}
@@ -405,7 +410,7 @@ const CareerPaths = () => {
                     <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
                       <h3 className="text-lg font-semibold mb-4">Required Skills</h3>
                       <div className="flex flex-wrap gap-2">
-                        {selectedPath.skills.map((skill) => (
+                        {(selectedPath.skills || []).map((skill) => (
                           <span 
                             key={skill}
                             className="px-3 py-1 rounded-full bg-[#2997ff]/10 text-[#2997ff] text-sm"
@@ -419,7 +424,7 @@ const CareerPaths = () => {
                     <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
                       <h3 className="text-lg font-semibold mb-4">Tools Used</h3>
                       <div className="flex flex-wrap gap-2">
-                        {selectedPath.tools.map((tool) => (
+                        {(selectedPath.tools || []).map((tool) => (
                           <span 
                             key={tool}
                             className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-500 text-sm"
@@ -435,15 +440,15 @@ const CareerPaths = () => {
                   <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
                     <h3 className="text-lg font-semibold mb-6">Learning Roadmap</h3>
                     <div className="space-y-6">
-                      {selectedPath.roadmap.map((stage, index) => (
+                      {(selectedPath.roadmap || []).map((stage, index) => (
                         <div key={stage.title} className="relative pl-8">
                           <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-[#2997ff]/20 border-2 border-[#2997ff]" />
-                          {index !== selectedPath.roadmap.length - 1 && (
+                          {index !== (selectedPath.roadmap || []).length - 1 && (
                             <div className="absolute left-2 top-4 w-0.5 h-full bg-[#2997ff]/20" />
                           )}
                           <h4 className="text-lg font-medium mb-2">{stage.title}</h4>
                           <ul className="space-y-2">
-                            {stage.items.map((item) => (
+                            {(stage.items || []).map((item) => (
                               <li key={item} className="text-gray-400">• {item}</li>
                             ))}
                           </ul>
@@ -456,7 +461,7 @@ const CareerPaths = () => {
                   <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
                     <h3 className="text-lg font-semibold mb-4">Communities to Learn From</h3>
                     <div className="flex flex-wrap gap-2">
-                      {selectedPath.communities.map((community) => (
+                      {(selectedPath.communities || []).map((community) => (
                         <span 
                           key={community}
                           className="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-sm"
