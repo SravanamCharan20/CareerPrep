@@ -1,4 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './redux/store';
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import Signin from "./pages/Signin";
@@ -25,44 +28,48 @@ import Settings from "./pages/Settings";
 
 export default function App() {
   return (
-    <RoadmapProvider>
-      <BrowserRouter>
-        <Navbar />
-        <div className="pt-18"> 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/signin" element={<Signin />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/hackathons" element={<HackathonsPage />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/mlprojects" element={<MLProjects />} />
-            <Route path="/mernprojects" element={<MernProjects />} />
-            <Route path="/roadmaps" element={<Roadmaps />} />
-            <Route path="/careerpaths" element={<CareerPaths />} />
-            <Route 
-              path="/roadmaps/*" 
-              element={
-                <PrivateRoute>
-                  <Routes>
-                    <Route index element={<Roadmaps />} />
-                    <Route path="frontend" element={<FrontendRoadmap />} />
-                    <Route path="backend" element={<BackendRoadmap />} />
-                    <Route path="mobile" element={<MobileRoadmap />} />
-                    <Route path="ai" element={<AIRoadmap />} />
-                  </Routes>
-                </PrivateRoute>
-              }
-            />
-            <Route path="/certifications" element={<Certifications />} />
-            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-            <Route path="/saved" element={<PrivateRoute><SavedItems /></PrivateRoute>} />
-            <Route path="/activity" element={<PrivateRoute><Activity /></PrivateRoute>} />
-            <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
-            <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
-          </Routes>
-        </div>
-      </BrowserRouter>
-    </RoadmapProvider>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <RoadmapProvider>
+          <BrowserRouter>
+            <Navbar />
+            <div className="pt-18"> 
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/signin" element={<Signin />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/hackathons" element={<HackathonsPage />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/mlprojects" element={<MLProjects />} />
+                <Route path="/mernprojects" element={<MernProjects />} />
+                <Route path="/roadmaps" element={<Roadmaps />} />
+                <Route path="/careerpaths" element={<CareerPaths />} />
+                <Route 
+                  path="/roadmaps/*" 
+                  element={
+                    <PrivateRoute>
+                      <Routes>
+                        <Route index element={<Roadmaps />} />
+                        <Route path="frontend" element={<FrontendRoadmap />} />
+                        <Route path="backend" element={<BackendRoadmap />} />
+                        <Route path="mobile" element={<MobileRoadmap />} />
+                        <Route path="ai" element={<AIRoadmap />} />
+                      </Routes>
+                    </PrivateRoute>
+                  }
+                />
+                <Route path="/certifications" element={<Certifications />} />
+                <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                <Route path="/saved" element={<PrivateRoute><SavedItems /></PrivateRoute>} />
+                <Route path="/activity" element={<PrivateRoute><Activity /></PrivateRoute>} />
+                <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
+                <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
+              </Routes>
+            </div>
+          </BrowserRouter>
+        </RoadmapProvider>
+      </PersistGate>
+    </Provider>
   );
 }

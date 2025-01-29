@@ -1,6 +1,7 @@
+/* eslint-disable react/prop-types */
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, Code, Brain, Target, Search, SlidersHorizontal, Terminal, Blocks, Cpu, Globe, Server, Smartphone } from "lucide-react";
+import { ArrowRight, Code, Brain, Target, Search, SlidersHorizontal, Terminal, Cpu } from "lucide-react";
 import { useSelector } from 'react-redux';
 import { useUserProgress } from '../hooks/useUserProgress';
 
@@ -49,26 +50,26 @@ const CodeBlock = () => (
         <span className="text-gray-400">=</span>
         <span className="text-[#ff375f] mx-2">async</span>
         <span className="text-gray-400">()</span>
-        <span className="text-[#2997ff] mx-2">=></span>
+        <span className="text-[#2997ff] mx-2">={">"}</span>
         <span className="text-gray-400">{'{'}</span>
       </div>
       <div className="pl-6">
         <span className="text-gray-400">await</span>
         <span className="text-[#2997ff] mx-2">learn</span>
         <span className="text-gray-400">(</span>
-        <span className="text-[#ff375f]">'new skills'</span>
+        <span className="text-[#ff375f]">&apos;new skills&apos;</span>
         <span className="text-gray-400">);</span>
       </div>
       <div className="pl-6">
         <span className="text-gray-400">await</span>
         <span className="text-[#2997ff] mx-2">build</span>
         <span className="text-gray-400">(</span>
-        <span className="text-[#ff375f]">'projects'</span>
+        <span className="text-[#ff375f]">&apos;projects&apos;</span>
         <span className="text-gray-400">);</span>
       </div>
       <div className="pl-6">
         <span className="text-[#2997ff]">return</span>
-        <span className="text-[#ff375f] mx-2">'success'</span>
+        <span className="text-[#ff375f] mx-2">&apos;success&apos;</span>
         <span className="text-gray-400">;</span>
       </div>
       <div className="text-gray-400">{'}'}</div>

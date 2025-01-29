@@ -1,5 +1,43 @@
 import {createSlice} from '@reduxjs/toolkit'
 
+const loadUserInteractions = () => {
+    try {
+        const user = localStorage.getItem('user');
+        if (!user) return null;
+        
+        const userId = JSON.parse(user)._id;
+        const savedInteractions = localStorage.getItem(`userInteractions_${userId}`);
+        return savedInteractions ? JSON.parse(savedInteractions) : null;
+    } catch (error) {
+        console.error('Error loading user interactions:', error);
+        return null;
+    }
+};
+
+const defaultInteractions = {
+    savedProjects: [],
+    savedHackathons: [],
+    savedCertifications: [],
+    bookmarks: [],
+    completedProjects: [],
+    projectProgress: {},
+    notes: {},
+    notifications: [],
+    activities: [],
+    stats: {
+        projectsCompleted: 0,
+        learningStreak: 0,
+        totalTimeSpent: 0,
+        certifications: 0
+    },
+    preferences: {
+        theme: 'dark',
+        notifications: true,
+        emailUpdates: true,
+        language: 'en'
+    }
+};
+
 const initialState = {
     currentUser: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
     error: null,
@@ -10,30 +48,8 @@ const initialState = {
         certifications: [],
         roadmapProgress: {}
     },
-    userInteractions: localStorage.getItem('userInteractions') ? JSON.parse(localStorage.getItem('userInteractions')) : {
-        savedProjects: [],
-        savedHackathons: [],
-        savedCertifications: [],
-        bookmarks: [],
-        completedProjects: [],
-        projectProgress: {},
-        notes: {},
-        notifications: [],
-        activities: [],
-        stats: {
-            projectsCompleted: 0,
-            learningStreak: 0,
-            totalTimeSpent: 0,
-            certifications: 0
-        },
-        preferences: {
-            theme: 'dark',
-            notifications: true,
-            emailUpdates: true,
-            language: 'en'
-        }
-    }
-}
+    userInteractions: loadUserInteractions() || defaultInteractions
+};
 
 const userSlice = createSlice({
     name: 'user',
@@ -47,13 +63,12 @@ const userSlice = createSlice({
             state.currentUser = action.payload;
             state.loading = false;
             state.error = null;
-            // Save user to localStorage
             localStorage.setItem('user', JSON.stringify(action.payload));
             
-            // Load user's saved interactions from localStorage if they exist
-            const savedInteractions = localStorage.getItem(`userInteractions_${action.payload._id}`);
+            // Load user interactions from localStorage
+            const savedInteractions = loadUserInteractions();
             if (savedInteractions) {
-                state.userInteractions = JSON.parse(savedInteractions);
+                state.userInteractions = savedInteractions;
             }
         },
         signInFailure: (state, action) => {
@@ -68,7 +83,6 @@ const userSlice = createSlice({
             state.currentUser = action.payload;
             state.loading = false;
             state.error = null;
-            // Save user to localStorage
             localStorage.setItem('user', JSON.stringify(action.payload));
             
             // Initialize user interactions
@@ -103,31 +117,24 @@ const userSlice = createSlice({
             state.loading = false;
         },
         signOut: (state) => {
-            // Save user interactions before signing out
+            // Save interactions before signing out
             if (state.currentUser) {
                 localStorage.setItem(
-                    `userInteractions_${state.currentUser._id}`, 
+                    `userInteractions_${state.currentUser._id}`,
                     JSON.stringify(state.userInteractions)
                 );
             }
-            state.currentUser = null;
-            state.loading = false;
-            state.error = null;
-            state.userProgress = {
-                completedCourses: [],
-                lastVisited: null,
-                certifications: [],
-                roadmapProgress: {}
-            };
-            // Don't clear userInteractions from localStorage
             localStorage.removeItem('user');
+            localStorage.removeItem('userProgress');
+            state.currentUser = null;
+            state.userProgress = initialState.userProgress;
+            state.userInteractions = initialState.userInteractions;
         },
         updateUserProgress: (state, action) => {
             state.userProgress = {
                 ...state.userProgress,
                 ...action.payload
             };
-            // Save progress to localStorage
             localStorage.setItem('userProgress', JSON.stringify(state.userProgress));
         },
         setLastVisited: (state, action) => {
@@ -150,10 +157,9 @@ const userSlice = createSlice({
         saveProject: (state, action) => {
             if (!state.userInteractions.savedProjects.some(p => p.id === action.payload.id)) {
                 state.userInteractions.savedProjects.push(action.payload);
-                // Save to user-specific storage
                 if (state.currentUser) {
                     localStorage.setItem(
-                        `userInteractions_${state.currentUser._id}`, 
+                        `userInteractions_${state.currentUser._id}`,
                         JSON.stringify(state.userInteractions)
                     );
                 }
@@ -162,7 +168,12 @@ const userSlice = createSlice({
         unsaveProject: (state, action) => {
             state.userInteractions.savedProjects = state.userInteractions.savedProjects
                 .filter(p => p.id !== action.payload);
-            localStorage.setItem('userInteractions', JSON.stringify(state.userInteractions));
+            if (state.currentUser) {
+                localStorage.setItem(
+                    `userInteractions_${state.currentUser._id}`,
+                    JSON.stringify(state.userInteractions)
+                );
+            }
         },
         saveHackathon: (state, action) => {
             if (!state.userInteractions.savedHackathons.some(h => h.id === action.payload.id)) {
@@ -185,7 +196,7 @@ const userSlice = createSlice({
                 state.userInteractions.bookmarks.push(action.payload);
                 if (state.currentUser) {
                     localStorage.setItem(
-                        `userInteractions_${state.currentUser._id}`, 
+                        `userInteractions_${state.currentUser._id}`,
                         JSON.stringify(state.userInteractions)
                     );
                 }
@@ -194,7 +205,12 @@ const userSlice = createSlice({
         removeBookmark: (state, action) => {
             state.userInteractions.bookmarks = state.userInteractions.bookmarks
                 .filter(b => b.id !== action.payload);
-            localStorage.setItem('userInteractions', JSON.stringify(state.userInteractions));
+            if (state.currentUser) {
+                localStorage.setItem(
+                    `userInteractions_${state.currentUser._id}`,
+                    JSON.stringify(state.userInteractions)
+                );
+            }
         },
         updateProjectProgress: (state, action) => {
             const { projectId, progress } = action.payload;
