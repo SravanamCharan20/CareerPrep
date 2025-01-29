@@ -55,7 +55,7 @@ const Navbar = () => {
           <ul className="hidden md:flex items-center space-x-8">
             <NavItem href="/projects">Projects</NavItem>
             <NavItem href="/hackathons">Hackathons</NavItem>
-            <NavItem href="/mentors">CareerPaths</NavItem>
+            <NavItem href="/careerpaths">CareerPaths</NavItem>
             <NavItem href="/roadmaps">Roadmaps</NavItem>
           </ul>
 

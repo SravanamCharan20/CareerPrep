@@ -13,6 +13,7 @@ import BackendRoadmap from './pages/roadmaps/BackendRoadmap';
 import MobileRoadmap from './pages/roadmaps/MobileRoadmap';
 import AIRoadmap from './pages/roadmaps/AIRoadmap';
 import { RoadmapProvider } from './contexts/RoadmapContext';
+import CareerPaths from "./pages/CareerPaths";
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/mlprojects" element={<MLProjects />} />
             <Route path="/mernprojects" element={<MernProjects />} />
             <Route path="/roadmaps" element={<Roadmaps />} />
+            <Route path="/careerpaths" element={<CareerPaths />} />
             <Route path="/roadmaps/frontend" element={<FrontendRoadmap />} />
             <Route path="/roadmaps/backend" element={<BackendRoadmap />} />
             <Route path="/roadmaps/mobile" element={<MobileRoadmap />} />

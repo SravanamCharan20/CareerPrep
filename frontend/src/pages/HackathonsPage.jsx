@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Calendar, MapPin, Users, ArrowRight, ExternalLink } from "lucide-react";
+import { Search, Calendar, MapPin, Users, ArrowRight, ExternalLink, Code, Trophy } from "lucide-react";
 
 // eslint-disable-next-line react/prop-types
 const HackathonCard = ({ hackathon }) => {
@@ -140,63 +140,109 @@ const HackathonsPage = () => {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
-      <section className="pt-32 pb-16 px-6">
-        <div className="max-w-[980px] mx-auto text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl sm:text-6xl font-semibold mb-6"
-          >
-            Hackathons
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-xl text-gray-400 mb-12"
-          >
-            Join exciting hackathons and build amazing projects
-          </motion.p>
+      <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] via-black to-black" />
+          <div className="absolute inset-0">
+            {/* Animated Grid */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f1a_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f1a_1px,transparent_1px)] bg-[size:24px_24px]" />
+            
+            {/* Glowing Orbs */}
+            <div className="absolute top-20 left-20 w-72 h-72 bg-[#2997ff]/20 rounded-full blur-[120px] animate-pulse" />
+            <div className="absolute bottom-10 right-20 w-96 h-96 bg-[#30d158]/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+            <div className="absolute top-40 right-40 w-64 h-64 bg-[#ff375f]/20 rounded-full blur-[120px] animate-pulse delay-700" />
+          </div>
+        </div>
 
-          {/* Search Bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="relative max-w-2xl mx-auto"
-          >
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search hackathons..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-[#1d1d1f] rounded-full border border-[#424245] text-white placeholder-gray-500 focus:outline-none focus:border-[#2997ff] transition-colors"
-            />
-          </motion.div>
-
-          {/* Filter Buttons */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="flex justify-center gap-4 mt-8"
-          >
-            {["all", "upcoming", "past"].map((filterType) => (
-              <button
-                key={filterType}
-                onClick={() => setFilter(filterType)}
-                className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-                  filter === filterType
-                    ? "bg-[#2997ff] text-white"
-                    : "text-gray-400 hover:text-white"
-                }`}
+        {/* Content */}
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
+          <div className="text-center">
+            {/* Floating Icons */}
+            <div className="relative mb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="absolute -top-16 left-1/2 -translate-x-32 w-16 h-16 bg-[#1c1c1e] rounded-2xl border border-[#2c2c2e] p-4"
               >
-                {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
-              </button>
-            ))}
-          </motion.div>
+                <Code className="w-full h-full text-[#2997ff]" />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="absolute -top-20 left-1/2 translate-x-16 w-14 h-14 bg-[#1c1c1e] rounded-2xl border border-[#2c2c2e] p-3"
+              >
+                <Trophy className="w-full h-full text-[#30d158]" />
+              </motion.div>
+            </div>
+
+            {/* Title with Gradient Animation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
+            >
+              <h1 className="text-5xl sm:text-7xl font-bold inline-block bg-clip-text text-transparent bg-gradient-to-r from-[#2997ff] via-[#30d158] to-[#ff375f] animate-gradient-x">
+                Hackathons
+              </h1>
+            </motion.div>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-xl text-gray-400 max-w-3xl mx-auto mb-12"
+            >
+              Join exciting hackathons and build amazing projects
+            </motion.p>
+
+            {/* Search and Filter Section with Glass Effect */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto backdrop-blur-lg bg-white/5 p-4 rounded-2xl border border-white/10"
+            >
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search hackathons..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:border-[#2997ff] text-white placeholder-gray-500 transition-all"
+                />
+              </div>
+            </motion.div>
+
+            {/* Filter Buttons */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex justify-center gap-4 mt-6"
+            >
+              {["all", "upcoming", "past"].map((filterType, index) => (
+                <motion.button
+                  key={filterType}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.1 }}
+                  onClick={() => setFilter(filterType)}
+                  className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                    filter === filterType
+                      ? 'bg-[#2997ff] text-white scale-105'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:scale-105'
+                  }`}
+                >
+                  {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
+                </motion.button>
+              ))}
+            </motion.div>
+          </div>
         </div>
       </section>
 

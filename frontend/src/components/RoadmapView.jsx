@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo } from 'react';
 import ReactFlow, { 
   Background, 
   Controls,
@@ -67,7 +67,7 @@ const CustomNode = React.memo(({ data }) => {
           relative
           group
           ${completed ? 'border-green-500' : 'border-white/10'}
-          transform hover:scale-[1.02]
+          transform transition-transform duration-300 hover:scale-105
         `}
       >
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity" />
@@ -396,7 +396,8 @@ export default function RoadmapView({ title, description, nodes }) {
     return { nodes, edges };
   }, [calculateNodePositions]);
 
-  const { nodes: initialNodes, edges: initialEdges } = createNodesAndEdges(nodes);
+  // Memoize the creation of nodes and edges
+  const { nodes: initialNodes, edges: initialEdges } = useMemo(() => createNodesAndEdges(nodes), [createNodesAndEdges, nodes]);
 
   const [flowNodes,, onNodesChange] = useNodesState(initialNodes);
   const [flowEdges,, onEdgesChange] = useEdgesState(initialEdges);
@@ -455,19 +456,21 @@ export default function RoadmapView({ title, description, nodes }) {
     }
   };
 
-  const handleStatusChange = (nodeId, status) => {
+  // Memoize handleStatusChange
+  const handleStatusChange = useCallback((nodeId, status) => {
     if (status === 'completed') {
       toggleStepCompletion(roadmapId, nodeId);
     } else {
-      // If status is pending, ensure it's not in completed state
       if (isStepCompleted(roadmapId, nodeId)) {
         toggleStepCompletion(roadmapId, nodeId);
       }
     }
-  };
+  }, [toggleStepCompletion, isStepCompleted, roadmapId]);
 
-  // Optimize ReactFlow settings
-  const flowOptions = {
+  // Memoize menuItems to prevent re-creation on every render
+
+  // Optimize ReactFlow settings using useMemo
+  const flowOptions = useMemo(() => ({
     fitView: true,
     minZoom: 0.2,
     maxZoom: 1.5,
@@ -478,7 +481,7 @@ export default function RoadmapView({ title, description, nodes }) {
       maxZoom: 1
     },
     proOptions: { hideAttribution: true }
-  };
+  }), []);
 
   return (
     <div className="min-h-screen bg-black text-white">
