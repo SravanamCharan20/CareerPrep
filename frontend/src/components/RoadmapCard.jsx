@@ -1,32 +1,61 @@
-import { Bookmark } from "lucide-react";
-import { useState } from "react";
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { Bookmark, ArrowRight } from 'lucide-react';
+import { useUserInteractions } from '../hooks/useUserInteractions';
 
 // eslint-disable-next-line react/prop-types
-export function RoadmapCard({ title, isNew }) {
-  const [isBookmarked, setIsBookmarked] = useState(false);
+export const RoadmapCard = ({ roadmap }) => {
+    const { handleBookmark, isBookmarked } = useUserInteractions();
 
-  return (
-    <div className="relative group">
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg blur-lg transition-opacity opacity-0 group-hover:opacity-100" />
-      <div className="relative p-6 rounded-lg border border-gray-800 bg-gray-900/50 hover:border-gray-700 transition-colors">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg text-gray-200">{title}</h3>
-          <div className="flex items-center gap-2">
-            {isNew && (
-              <span className="px-2 py-1 text-xs rounded-full bg-purple-500/10 text-purple-300 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-purple-400" />
-                New
-              </span>
-            )}
+    return (
+        <motion.div 
+            className="relative bg-[#1c1c1e] rounded-xl p-6 group"
+            whileHover={{ scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+        >
+            {/* Bookmark Button */}
             <button
-              onClick={() => setIsBookmarked(!isBookmarked)}
-              className="text-gray-400 hover:text-gray-200 transition-colors"
+                onClick={() => handleBookmark({
+                    id: roadmap.id,
+                    title: roadmap.title,
+                    path: `/roadmaps/${roadmap.id}`,
+                    type: 'roadmap'
+                })}
+                className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-full transition-colors"
             >
-              <Bookmark className={isBookmarked ? "fill-current" : ""} size={20} />
+                <Bookmark 
+                    className={`w-5 h-5 ${
+                        isBookmarked(roadmap.id) ? 'fill-[#2997ff] text-[#2997ff]' : 'text-gray-400'
+                    }`}
+                />
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+
+            {/* Roadmap Content */}
+            <div className="mb-4">
+                <h3 className="text-xl font-semibold mb-2">{roadmap.title}</h3>
+                <p className="text-gray-400">{roadmap.description}</p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p className="text-sm text-gray-500">Estimated Time</p>
+                    <p className="text-base text-gray-300">{roadmap.duration}</p>
+                </div>
+                <div>
+                    <p className="text-sm text-gray-500">Difficulty</p>
+                    <p className="text-base text-gray-300">{roadmap.difficulty}</p>
+                </div>
+            </div>
+
+            {/* View Roadmap Link */}
+            <Link 
+                to={`/roadmaps/${roadmap.id}`}
+                className="inline-flex items-center gap-2 text-[#2997ff] hover:underline mt-4"
+            >
+                View Roadmap
+                <ArrowRight className="w-4 h-4" />
+            </Link>
+        </motion.div>
+    );
+};

@@ -2,6 +2,8 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight , ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSelector } from 'react-redux';
+import { useUserProgress } from '../hooks/useUserProgress';
 
 const ScrollIndicator = () => (
   <motion.div
@@ -106,6 +108,9 @@ const ProjectShowcase = ({ title, description, image, index }) => (
 );
 
 const Home = () => {
+  const { currentUser } = useSelector(state => state.user);
+  const { lastVisited, completedCourses } = useUserProgress();
+
   return (
     <div className="bg-black text-white">
       {/* Hero Section */}
@@ -321,6 +326,28 @@ const Home = () => {
           </div>
         </div>
       </footer>
+
+      {currentUser && lastVisited && (
+        <section className="bg-[#1c1c1e] p-6 rounded-xl mb-8">
+          <h2 className="text-2xl font-bold mb-4">
+            Welcome back, {currentUser.username}!
+          </h2>
+          <p className="text-gray-400">
+            Continue where you left off:
+          </p>
+          <Link 
+            to={lastVisited.path}
+            className="mt-4 inline-block text-[#2997ff]"
+          >
+            Resume Learning →
+          </Link>
+          <div className="mt-4">
+            <p className="text-gray-400">
+              Completed Courses: {completedCourses.length}
+            </p>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

@@ -2,28 +2,28 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Lock } from "lucide-react";
 import { useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { signUpStart, signUpSuccess, signUpFailure } from '../redux/user/userSlice';
 
 const Signup = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); // Track error messages
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
   });
 
-  // Handle input changes
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // Handle form submission
-  const handlesubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Reset error before making a request
     try {
-      setLoading(true);
+      dispatch(signUpStart());
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
@@ -32,22 +32,16 @@ const Signup = () => {
         body: JSON.stringify(formData),
       });
 
-      // Check response status
+      const data = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Failed to sign up.");
+        throw new Error(data.message || "Signup failed");
       }
 
-      const data = await res.json();
-      console.log("Signup successful:", data);
-
-      // Redirect to the signin page
+      dispatch(signUpSuccess(data));
       navigate("/signin");
     } catch (err) {
-      console.error("Error during signup:", err.message);
-      setError(err.message); // Display error to the user
-    } finally {
-      setLoading(false);
+      dispatch(signUpFailure(err.message));
     }
   };
 
@@ -66,7 +60,7 @@ const Signup = () => {
 
         <motion.form
           className="space-y-6"
-          onSubmit={handlesubmit}
+          onSubmit={handleSubmit}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.8 }}

@@ -1,13 +1,15 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { Code, Brain, Plus, ArrowRight, Search, SlidersHorizontal } from 'lucide-react';
+import { Code, Brain, Plus, ArrowRight, Search, SlidersHorizontal, Bookmark } from 'lucide-react';
 import { useState } from 'react';
+import { useUserInteractions } from '../hooks/useUserInteractions';
+import { useNavigate } from 'react-router-dom';
 
 export default function Projects() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const { handleBookmark, isBookmarked } = useUserInteractions();
 
   const projectCategories = [
     {
@@ -73,6 +75,18 @@ export default function Projects() {
     if (selectedFilter === 'upcoming') return category.title.includes('Coming Soon');
     return true;
   });
+
+  const handleSaveCategory = (e, category) => {
+    e.stopPropagation(); // Prevent navigation when clicking save button
+    handleBookmark({
+      id: category.title.toLowerCase().replace(/\s+/g, '-'),
+      title: category.title,
+      path: category.path,
+      type: 'project-category',
+      description: category.description,
+      icon: category.icon
+    });
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -214,6 +228,22 @@ export default function Projects() {
                 />
               </div>
 
+              {/* Save Button */}
+              {!category.disabled && (
+                <button
+                  onClick={(e) => handleSaveCategory(e, category)}
+                  className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-full transition-colors z-10"
+                >
+                  <Bookmark 
+                    className={`w-5 h-5 ${
+                      isBookmarked(category.title.toLowerCase().replace(/\s+/g, '-')) 
+                        ? 'fill-[#2997ff] text-[#2997ff]' 
+                        : 'text-gray-400'
+                    }`}
+                  />
+                </button>
+              )}
+
               {/* Content */}
               <div className="relative h-full p-8 flex flex-col">
                 {/* Icon */}
@@ -247,9 +277,6 @@ export default function Projects() {
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 )}
-
-                {/* Border */}
-                <div className="absolute inset-0 rounded-3xl border border-[#333333] group-hover:border-[#444444] transition-colors" />
               </div>
             </motion.div>
           ))}

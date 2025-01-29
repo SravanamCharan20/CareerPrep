@@ -2,14 +2,17 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock } from "lucide-react";
 import { useState } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
 
 const Signin = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null); // For displaying error messages
+  
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
 
   // Handle input changes
@@ -20,9 +23,8 @@ const Signin = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); // Reset error before submitting
     try {
-      setLoading(true);
+      dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
         headers: {
@@ -31,22 +33,16 @@ const Signin = () => {
         body: JSON.stringify(formData),
       });
 
-      // Check if the response is successful
+      const data = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Login failed. Please try again.");
+        throw new Error(data.message || "Login failed");
       }
 
-      const data = await res.json();
-      console.log("Signin successful:", data);
-
-      // Redirect to dashboard or homepage
+      dispatch(signInSuccess(data));
       navigate("/");
     } catch (err) {
-      console.error("Error during signin:", err.message);
-      setError(err.message); // Display error message
-    } finally {
-      setLoading(false);
+      dispatch(signInFailure(err.message));
     }
   };
 
