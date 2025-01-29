@@ -57,6 +57,7 @@ const Navbar = () => {
             <NavItem href="/hackathons">Hackathons</NavItem>
             <NavItem href="/careerpaths">CareerPaths</NavItem>
             <NavItem href="/roadmaps">Roadmaps</NavItem>
+            <NavItem href="/certifications">Certifications</NavItem>
           </ul>
 
           {/* Right Section */}

@@ -14,6 +14,7 @@ import MobileRoadmap from './pages/roadmaps/MobileRoadmap';
 import AIRoadmap from './pages/roadmaps/AIRoadmap';
 import { RoadmapProvider } from './contexts/RoadmapContext';
 import CareerPaths from "./pages/CareerPaths";
+import Certifications from './pages/Certifications';
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/roadmaps/backend" element={<BackendRoadmap />} />
             <Route path="/roadmaps/mobile" element={<MobileRoadmap />} />
             <Route path="/roadmaps/ai" element={<AIRoadmap />} />
+            <Route path="/certifications" element={<Certifications />} />
           </Routes>
         </div>
       </BrowserRouter>
