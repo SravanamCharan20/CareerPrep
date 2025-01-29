@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 
 const RoadmapContext = createContext();
 
+// eslint-disable-next-line react/prop-types
 export function RoadmapProvider({ children }) {
   const [progress, setProgress] = useState(() => {
     // Load progress from localStorage if available
@@ -64,6 +65,7 @@ export function RoadmapProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useRoadmap() {
   return useContext(RoadmapContext);
 } 

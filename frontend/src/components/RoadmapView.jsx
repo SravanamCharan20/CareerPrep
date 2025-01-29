@@ -18,7 +18,6 @@ import {
   Book, 
   Target, 
   Users,
-  Bookmark,
   Calendar,
   Download,
   Share2,
@@ -286,7 +285,6 @@ export default function RoadmapView({ title, description, nodes }) {
   
   const [selectedNode, setSelectedNode] = useState(null);
   const [isFullscreen] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
   const flowContainerRef = useRef(null);
 
   // Get roadmapId from URL
@@ -485,36 +483,14 @@ export default function RoadmapView({ title, description, nodes }) {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Fixed Navigation Bar */}
-      <div className="fixed top-0 left-0 right-0 bg-black/80 backdrop-blur-md z-40 border-b border-white/10">
-        <div className="max-w-[1400px] mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            {/* Left Side - Back Button */}
-            <button
-              onClick={() => navigate('/roadmaps')}
-              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>All Roadmaps</span>
-            </button>
-
-            {/* Center - Title */}
-            <h1 className="text-xl font-semibold">{title}</h1>
-
-            {/* Right Side - Actions */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setIsBookmarked(!isBookmarked)}
-                className={`p-2 rounded-lg border ${
-                  isBookmarked 
-                    ? 'border-[#2997ff] text-[#2997ff]' 
-                    : 'border-white/10 text-gray-400 hover:text-white'
-                } transition-colors`}
-              >
-                <Bookmark className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="fixed top-4 left-4 z-40">
+        <button
+          onClick={() => navigate('/roadmaps')}
+          className="flex items-center gap-2 mt-20 ml-20 hover:text-white transition-colors cursor-pointer bg-clip-text text-white hover:bg-gradient-to-r from-[#2997ff] via-[#30d158] to-[#ff375f] backdrop-blur-md p-2  rounded-lg border border-white/50"
+        > 
+          <ArrowLeft className="w-4 h-4" />
+          <span>All Roadmaps</span>
+        </button>
       </div>
 
       <div className="pt-20">
