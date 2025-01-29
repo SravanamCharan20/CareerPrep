@@ -20,14 +20,34 @@ const CareerPaths = () => {
   // Memoize allPaths to prevent unnecessary recalculations
   const allPaths = useMemo(() => Object.values(careerPaths), []);
 
-  // Memoize filters object
-  const filters = useMemo(() => ({
-    all: 'All Paths',
-    development: 'Development',
-    data: 'Data & AI',
-    devops: 'DevOps & Cloud',
-    mobile: 'Mobile & Gaming'
-  }), []);
+  // Define filters object
+  const filters = {
+    all: {
+      label: 'All Paths',
+      icon: Code,
+      color: '#2997ff'
+    },
+    development: {
+      label: 'Development',
+      icon: Code,
+      color: '#30d158'
+    },
+    data: {
+      label: 'Data & AI',
+      icon: Brain,
+      color: '#ff375f'
+    },
+    devops: {
+      label: 'DevOps & Cloud',
+      icon: Code,
+      color: '#bf5af2'
+    },
+    mobile: {
+      label: 'Mobile & Gaming',
+      icon: Code,
+      color: '#ff9f0a'
+    }
+  };
 
   // Memoize filter function
   const filterPaths = useMemo(() => {
@@ -167,19 +187,19 @@ const CareerPaths = () => {
 
             {/* Filter Tags with Animation */}
             <AnimatePresence>
-              {showFilters && (
+              {showFilters && filters && (
                 <motion.div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   className="flex flex-wrap justify-center gap-3 mt-6"
                 >
-                  {Object.entries(filters).map(([key, label], index) => (
+                  {Object.entries(filters).map(([key, filter]) => (
                     <motion.button
                       key={key}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.1 }}
+                      transition={{ delay: 0.1 }}
                       onClick={() => setSelectedFilter(key)}
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                         selectedFilter === key
@@ -187,7 +207,7 @@ const CareerPaths = () => {
                           : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:scale-105'
                       }`}
                     >
-                      {label}
+                      {filter.label}
                     </motion.button>
                   ))}
                 </motion.div>
