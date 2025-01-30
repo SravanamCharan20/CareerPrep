@@ -21,6 +21,32 @@ const defaultInteractions = {
         notifications: true,
         emailUpdates: true,
         language: 'en'
+    },
+    roadmapProgress: {
+        frontend: {
+            progress: 0,
+            completedNodes: [],
+            totalNodes: 0
+        },
+        backend: {
+            progress: 0,
+            completedNodes: [],
+            totalNodes: 0
+        },
+        mobile: {
+            progress: 0,
+            completedNodes: [],
+            totalNodes: 0
+        },
+        ai: {
+            progress: 0,
+            completedNodes: [],
+            totalNodes: 0
+        }
+    },
+    activities: [],
+    stats: {
+        totalTimeSpent: 0
     }
 };
 
@@ -28,12 +54,7 @@ const initialState = {
     currentUser: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
     error: null,
     loading: false,
-    userProgress: localStorage.getItem('userProgress') ? JSON.parse(localStorage.getItem('userProgress')) : {
-        completedCourses: [],
-        lastVisited: null,
-        certifications: [],
-        roadmapProgress: {}
-    },
+    userProgress: localStorage.getItem('userProgress') ? JSON.parse(localStorage.getItem('userProgress')) : null,
     userInteractions: loadUserInteractions() || defaultInteractions
 };
 
@@ -71,16 +92,9 @@ const userSlice = createSlice({
             state.error = null;
             localStorage.setItem('user', JSON.stringify(action.payload));
             
-            // Initialize user interactions
-            state.userInteractions = {
-                bookmarks: [],
-                preferences: {
-                    theme: 'dark',
-                    notifications: true,
-                    emailUpdates: true,
-                    language: 'en'
-                }
-            };
+            // Initialize user interactions with the correct structure
+            state.userInteractions = defaultInteractions;
+            
             // Save initial interactions
             localStorage.setItem(`userInteractions_${action.payload._id}`, JSON.stringify(state.userInteractions));
         },
@@ -120,11 +134,36 @@ const userSlice = createSlice({
             }
         },
         updateRoadmapProgress: (state, action) => {
-            state.userProgress.roadmapProgress = {
-                ...state.userProgress.roadmapProgress,
-                ...action.payload
+            const { roadmapId, data } = action.payload;
+            
+            // Ensure all required arrays exist
+            if (!state.userInteractions.activities) {
+                state.userInteractions.activities = [];
+            }
+            
+            if (!state.userInteractions.roadmapProgress) {
+                state.userInteractions.roadmapProgress = defaultInteractions.roadmapProgress;
+            }
+
+            // Update the progress for the specific roadmap
+            state.userInteractions.roadmapProgress[roadmapId] = {
+                ...state.userInteractions.roadmapProgress[roadmapId],
+                ...data
             };
-            localStorage.setItem('userProgress', JSON.stringify(state.userProgress));
+
+            // Add to activities
+            state.userInteractions.activities.unshift({
+                title: `Made progress in ${roadmapId.charAt(0).toUpperCase() + roadmapId.slice(1)} Development`,
+                timestamp: new Date().toISOString()
+            });
+
+            // Save to localStorage
+            if (state.currentUser) {
+                localStorage.setItem(
+                    `userInteractions_${state.currentUser._id}`,
+                    JSON.stringify(state.userInteractions)
+                );
+            }
         },
         saveProject: (state, action) => {
             if (!state.userInteractions.savedProjects.some(p => p.id === action.payload.id)) {

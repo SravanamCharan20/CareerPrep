@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom';
 import { Globe, Server, Smartphone, Brain, ArrowRight, Search, SlidersHorizontal, Bookmark } from 'lucide-react';
 import { useState } from 'react';
 import { useUserInteractions } from '../hooks/useUserInteractions';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateRoadmapProgress } from '../redux/user/userSlice';
+import { useRoadmapProgress } from '../hooks/useRoadmapProgress';
 
 const roadmaps = [
   {
@@ -56,6 +59,22 @@ export default function Roadmaps() {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
+  const { roadmapProgress } = useRoadmapProgress();
+  const { userInteractions } = useSelector(state => state.user);
+
+  // Add loading state
+  if (!userInteractions) {
+    return (
+      <div className="min-h-screen bg-black text-white pt-20">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="bg-[#1c1c1e] rounded-xl p-8 text-center">
+            <Globe className="w-12 h-12 text-gray-400 mx-auto mb-4 animate-pulse" />
+            <p className="text-gray-400">Loading roadmaps...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const filters = {
     all: {
@@ -268,6 +287,45 @@ export default function Roadmaps() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-400">{roadmap.level}</span>
                         <ArrowRight className="w-5 h-5 text-[#2997ff] transform group-hover:translate-x-1 transition-transform" />
+                      </div>
+
+                      {/* Progress Section */}
+                      <div className="mt-4">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-gray-400">Progress</span>
+                          <span className="text-[#2997ff]">
+                            {Math.round(roadmapProgress[roadmap.id]?.progress || 0)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/5 rounded-full h-2">
+                          <div 
+                            className="bg-[#2997ff] h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${roadmapProgress[roadmap.id]?.progress || 0}%` }}
+                          />
+                        </div>
+                        <div className="mt-2 text-xs text-gray-400">
+                          {roadmapProgress[roadmap.id]?.completedNodes?.length || 0} of {roadmap.totalNodes} topics completed
+                        </div>
+                      </div>
+
+                      {/* Status Badge */}
+                      <div className="absolute top-4 left-4">
+                        <span 
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            (roadmapProgress[roadmap.id]?.progress || 0) === 100
+                              ? 'bg-green-500/10 text-green-500'
+                              : (roadmapProgress[roadmap.id]?.progress || 0) > 0
+                              ? 'bg-blue-500/10 text-blue-500'
+                              : 'bg-gray-500/10 text-gray-400'
+                          }`}
+                        >
+                          {(roadmapProgress[roadmap.id]?.progress || 0) === 100 
+                            ? 'Completed'
+                            : (roadmapProgress[roadmap.id]?.progress || 0) > 0
+                            ? 'In Progress'
+                            : 'Not Started'
+                          }
+                        </span>
                       </div>
 
                       {/* Border */}

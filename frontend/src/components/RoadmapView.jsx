@@ -22,19 +22,24 @@ import {
   Download,
   Share2,
   HelpCircle,
-  ChevronDown
+  ChevronDown,
+  CheckCircle,
+  Circle
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 import 'reactflow/dist/style.css';
 import { useNavigate } from 'react-router-dom';
 import { useRoadmap } from '../contexts/RoadmapContext';
 import React from 'react';
+import { useRoadmapProgress } from '../hooks/useRoadmapProgress';
+import RoadmapProgress from './RoadmapProgress';
+import RoadmapSidebar from './RoadmapSidebar';
 
 // Memoize CustomNode component to prevent unnecessary re-renders
 // eslint-disable-next-line react/display-name
 const CustomNode = React.memo(({ data }) => {
-  const { isStepCompleted } = useRoadmap();
-  const completed = isStepCompleted(data.roadmapId, data.id);
+  const { getNodeStatus } = useRoadmapProgress();
+  const completed = getNodeStatus(data.roadmapId, data.id);
 
   const handleClick = useCallback((e) => {
     e.stopPropagation();
@@ -62,11 +67,10 @@ const CustomNode = React.memo(({ data }) => {
             : 'bg-[#1d1d1f]/90 backdrop-blur-xl w-[240px]'
           }
           shadow-lg hover:shadow-xl
-          border border-white/10 hover:border-[#2997ff]/30
+          border ${completed ? 'border-green-500' : 'border-white/10'} hover:border-[#2997ff]/30
           cursor-pointer
           relative
           group
-          ${completed ? 'border-green-500' : 'border-white/10'}
           transform transition-transform duration-300 hover:scale-105
         `}
       >
@@ -97,11 +101,14 @@ const CustomNode = React.memo(({ data }) => {
             )}
           </div>
         </div>
-        {completed && (
-          <div className="absolute top-2 right-2">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
-          </div>
-        )}
+        {/* Add visible checkbox */}
+        <div className="absolute top-2 right-2 p-1 rounded-full bg-white/5">
+          {completed ? (
+            <CheckCircle className="w-4 h-4 text-green-500" />
+          ) : (
+            <Circle className="w-4 h-4 text-gray-400" />
+          )}
+        </div>
       </div>
 
       {!data.isLeaf && (
@@ -274,14 +281,30 @@ SidebarContent.propTypes = {
   handleStatusChange: PropTypes.func.isRequired
 };
 
+// Create memoized nodeTypes outside of the main component
+const nodeTypes = { custom: CustomNode };
+
+// Memoize edge styles
+const edgeStyles = {
+  stroke: '#2997ff',
+  strokeWidth: 2,
+  opacity: 0.6
+};
+
+const edgeMarker = {
+  type: 'arrow',
+  color: '#2997ff',
+  width: 20,
+  height: 20
+};
+
 export default function RoadmapView({ title, description, nodes }) {
   const navigate = useNavigate();
   const { 
-    toggleStepCompletion, 
-    isStepCompleted, 
-    getCompletedSteps, 
-    getTotalSteps 
-  } = useRoadmap();
+    updateNodeProgress, 
+    getNodeStatus, 
+    roadmapProgress 
+  } = useRoadmapProgress();
   
   const [selectedNode, setSelectedNode] = useState(null);
   const [isFullscreen] = useState(false);
@@ -289,19 +312,38 @@ export default function RoadmapView({ title, description, nodes }) {
 
   // Get roadmapId from URL
   const roadmapId = window.location.pathname.split('/').pop();
-  const completedSteps = getCompletedSteps(roadmapId);
-  const totalSteps = getTotalSteps(roadmapId);
+  const currentRoadmap = roadmapProgress[roadmapId] || { 
+    progress: 0, 
+    completedNodes: [], 
+    totalNodes: 0 
+  };
+  
+  // Calculate total nodes for this roadmap
+  const totalNodes = useMemo(() => {
+    let count = 0;
+    const countNodes = (node) => {
+      count++;
+      if (node.children) {
+        node.children.forEach(countNodes);
+      }
+    };
+    countNodes(nodes);
+    return count;
+  }, [nodes]);
 
-  // Update node data to include roadmapId
-  const processNodeData = (node) => ({
+  const completedSteps = currentRoadmap.completedNodes.length;
+
+  // Update node data to include roadmapId and completion status
+  const processNodeData = useCallback((node) => ({
     ...node,
     roadmapId,
-    completed: isStepCompleted(roadmapId, node.id)
-  });
+    completed: getNodeStatus(roadmapId, node.id)
+  }), [roadmapId, getNodeStatus]);
 
-  const handleNodeClick = useCallback((nodeData) => {
-    setSelectedNode(nodeData);
-  }, []);
+  // Handle node status change
+  const handleStatusChange = useCallback((nodeId, status) => {
+    updateNodeProgress(roadmapId, nodeId, status === 'completed', totalNodes);
+  }, [updateNodeProgress, roadmapId, totalNodes]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const calculateNodePositions = useCallback((node, level = 0, parentX = 0) => {
@@ -336,7 +378,8 @@ export default function RoadmapView({ title, description, nodes }) {
         skills: node.skills,
         resources: node.resources,
         icon: node.icon,
-        onClick: handleNodeClick
+        onClick: setSelectedNode,
+        totalNodes: totalNodes
       },
       type: 'custom'
     });
@@ -356,7 +399,7 @@ export default function RoadmapView({ title, description, nodes }) {
     }
 
     return positions;
-  });
+  }, [processNodeData, setSelectedNode, totalNodes]);
 
   const createNodesAndEdges = useCallback((node) => {
     const nodes = calculateNodePositions(node);
@@ -373,17 +416,8 @@ export default function RoadmapView({ title, description, nodes }) {
           target: nodeId,
           type: 'smoothstep',
           animated: true,
-          style: { 
-            stroke: '#2997ff',
-            strokeWidth: 2,
-            opacity: 0.6
-          },
-          markerEnd: {
-            type: 'arrow',
-            color: '#2997ff',
-            width: 20,
-            height: 20
-          }
+          style: edgeStyles,
+          markerEnd: edgeMarker
         });
       }
 
@@ -423,8 +457,8 @@ export default function RoadmapView({ title, description, nodes }) {
       description,
       progress: {
         completed: completedSteps,
-        total: totalSteps,
-        percentage: Math.round((completedSteps / totalSteps) * 100)
+        total: totalNodes,
+        percentage: Math.round((completedSteps / totalNodes) * 100)
       },
       nodes: nodes
     };
@@ -456,25 +490,11 @@ export default function RoadmapView({ title, description, nodes }) {
     }
   };
 
-  // Memoize handleStatusChange
-  const handleStatusChange = useCallback((nodeId, status) => {
-    if (status === 'completed') {
-      toggleStepCompletion(roadmapId, nodeId);
-    } else {
-      if (isStepCompleted(roadmapId, nodeId)) {
-        toggleStepCompletion(roadmapId, nodeId);
-      }
-    }
-  }, [toggleStepCompletion, isStepCompleted, roadmapId]);
-
-  // Memoize menuItems to prevent re-creation on every render
-
-  // Optimize ReactFlow settings using useMemo
+  // Update flowOptions to remove defaultZoom
   const flowOptions = useMemo(() => ({
     fitView: true,
     minZoom: 0.2,
     maxZoom: 1.5,
-    defaultZoom: 0.6,
     fitViewOptions: {
       padding: 0.4,
       minZoom: 0.2,
@@ -574,7 +594,7 @@ export default function RoadmapView({ title, description, nodes }) {
                 edges={flowEdges}
                 onNodesChange={onNodesChange}
                 onEdgesChange={onEdgesChange}
-                nodeTypes={{ custom: CustomNode }}
+                nodeTypes={nodeTypes}
                 {...flowOptions}
                 className="h-full"
               >
@@ -618,14 +638,17 @@ export default function RoadmapView({ title, description, nodes }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium px-3 py-1 rounded-full bg-[#f7df1e]/20 text-[#f7df1e]">
-                  {Math.round((completedSteps / totalSteps) * 100)}% DONE
+                  {Math.round((completedSteps / totalNodes) * 100)}% DONE
                 </span>
                 <span className="text-gray-400">
-                  {completedSteps} of {totalSteps} Done
+                  {completedSteps} of {totalNodes} Topics Completed
                 </span>
               </div>
 
-              <button className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+              <button 
+                onClick={() => setSelectedNode(nodes)} // Open sidebar with root node
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              >
                 <HelpCircle className="w-4 h-4" />
                 <span>Track Progress</span>
               </button>
@@ -635,7 +658,7 @@ export default function RoadmapView({ title, description, nodes }) {
             <div className="h-1 w-full bg-white/5 mt-4 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-[#f7df1e] transition-all duration-300"
-                style={{ width: `${(completedSteps / totalSteps) * 100}%` }}
+                style={{ width: `${(completedSteps / totalNodes) * 100}%` }}
               />
             </div>
           </div>
@@ -735,33 +758,26 @@ export default function RoadmapView({ title, description, nodes }) {
           </div>
         </section>
 
-        {/* Sidebar */}
+        {/* Progress Tracking Sidebar */}
         <AnimatePresence>
-          {selectedNode && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedNode(null)}
-                className="fixed inset-0 bg-black/80 backdrop-blur-md z-40"
-              />
-              <motion.div
-                initial={{ x: '100%' }}
-                animate={{ x: 0 }}
-                exit={{ x: '100%' }}
-                transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-                className="fixed top-0 right-0 h-full w-full max-w-md bg-[#1d1d1f]/95 backdrop-blur-2xl z-50 overflow-y-auto border-l border-white/10"
-              >
-                <SidebarContent 
-                  node={selectedNode}
-                  roadmapId={roadmapId}
-                  onClose={() => setSelectedNode(null)}
-                  handleStatusChange={handleStatusChange}
-                />
-              </motion.div>
-            </>
-          )}
+            {selectedNode && (
+                <>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setSelectedNode(null)}
+                        className="fixed inset-0 bg-black/80 backdrop-blur-md z-40"
+                    />
+                    <RoadmapSidebar 
+                        isOpen={!!selectedNode}
+                        onClose={() => setSelectedNode(null)}
+                        roadmapId={roadmapId}
+                        nodes={nodes}
+                        currentNode={selectedNode}
+                    />
+                </>
+            )}
         </AnimatePresence>
       </div>
     </div>
