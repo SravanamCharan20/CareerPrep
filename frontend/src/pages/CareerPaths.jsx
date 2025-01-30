@@ -6,7 +6,6 @@ import {
   ArrowRight,
   Code,
   Brain,
-  Briefcase,
   Bookmark
 } from 'lucide-react';
 import React from 'react';
@@ -22,6 +21,7 @@ const CareerPaths = () => {
   const [showFilters, setShowFilters] = useState(false);
   const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
   const { trackCareerPathExplored } = useActivityTracking();
+  const [bookmarkLoading, setBookmarkLoading] = useState({});
 
   // Memoize allPaths to prevent unnecessary recalculations
   const allPaths = useMemo(() => Object.values(careerPaths), []);
@@ -106,6 +106,38 @@ const CareerPaths = () => {
   const handlePathSelect = (path) => {
     setSelectedPath(path);
     trackCareerPathExplored(path);
+  };
+
+  // Create a wrapped bookmark handler with better error handling
+  const handleBookmarkClick = async (e, path) => {
+    e.stopPropagation(); // Prevent event bubbling
+    
+    if (bookmarkLoading[path.id]) return; // Prevent multiple clicks for this path
+    
+    try {
+      setBookmarkLoading(prev => ({ ...prev, [path.id]: true }));
+      
+      if (isBookmarked(path.id)) {
+        await handleRemoveBookmark(path.id);
+      } else {
+        const bookmarkData = {
+          id: path.id,
+          title: path.title,
+          path: `/careerpaths/${path.id}`,
+          category: 'Career Paths',
+          description: path.description,
+          duration: path.duration,
+          timestamp: new Date().toISOString() // Add timestamp for lastVisited
+        };
+        
+        await handleBookmark(bookmarkData);
+      }
+    } catch (error) {
+      console.error('Bookmark operation failed:', error);
+      // Could add toast notification here if you have a notification system
+    } finally {
+      setBookmarkLoading(prev => ({ ...prev, [path.id]: false }));
+    }
   };
 
   return (
@@ -250,29 +282,20 @@ const CareerPaths = () => {
                   {/* Bookmark Button */}
                   <div 
                     className="absolute top-4 right-4 z-10"
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent opening the modal when clicking bookmark
-                    }}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <button
-                      onClick={() => {
-                        if (isBookmarked(path.id)) {
-                          handleRemoveBookmark(path.id);
-                        } else {
-                          handleBookmark({
-                            id: path.id,
-                            title: path.title,
-                            path: `/careerpaths/${path.id}`,
-                            category: 'Career Paths',
-                            description: path.description,
-                            duration: path.duration
-                          });
-                        }
-                      }}
-                      className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                      onClick={(e) => handleBookmarkClick(e, path)}
+                      disabled={bookmarkLoading[path.id]}
+                      aria-label={isBookmarked(path.id) ? "Remove from bookmarks" : "Add to bookmarks"}
+                      className={`p-2 rounded-full transition-all ${
+                        bookmarkLoading[path.id] 
+                          ? 'opacity-50 cursor-not-allowed' 
+                          : 'hover:bg-white/10'
+                      }`}
                     >
                       <Bookmark 
-                        className={`w-5 h-5 ${
+                        className={`w-5 h-5 transition-colors ${
                           isBookmarked(path.id) 
                             ? 'text-[#30d158] fill-[#30d158]' 
                             : 'text-gray-400'

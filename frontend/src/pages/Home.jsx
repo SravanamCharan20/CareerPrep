@@ -2,8 +2,10 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, Code, Brain, Target, Search, SlidersHorizontal, Terminal, Cpu } from "lucide-react";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useUserProgress } from '../hooks/useUserProgress';
+import { setLastVisited } from '../redux/userSlice';
+import { useEffect } from 'react';
 
 const FeatureCard = ({ icon: Icon, title, description, color, gradient }) => (
   <div className="relative group aspect-[4/3]">
@@ -195,6 +197,16 @@ const LearningTrack = ({ title, description, modules, color, path }) => (
 const Home = () => {
   const { currentUser } = useSelector(state => state.user);
   const { lastVisited, completedCourses } = useUserProgress();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (currentUser && (!lastVisited || !lastVisited.path)) {
+        dispatch(setLastVisited({
+            path: window.location.pathname,
+            timestamp: new Date().toISOString()
+        }));
+    }
+  }, [dispatch, currentUser, lastVisited]);
 
   return (
     <div className="min-h-screen bg-black text-white">

@@ -59,7 +59,10 @@ const initialState = {
     currentUser: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null,
     error: null,
     loading: false,
-    userProgress: localStorage.getItem('userProgress') ? JSON.parse(localStorage.getItem('userProgress')) : null,
+    userProgress: localStorage.getItem('userProgress') ? JSON.parse(localStorage.getItem('userProgress')) : {
+        lastVisited: null,
+        completedCourses: []
+    },
     userInteractions: loadUserInteractions() || defaultInteractions
 };
 
@@ -129,6 +132,12 @@ const userSlice = createSlice({
             localStorage.setItem('userProgress', JSON.stringify(state.userProgress));
         },
         setLastVisited: (state, action) => {
+            if (!state.userProgress) {
+                state.userProgress = {
+                    lastVisited: null,
+                    completedCourses: []
+                };
+            }
             state.userProgress.lastVisited = action.payload;
             localStorage.setItem('userProgress', JSON.stringify(state.userProgress));
         },
