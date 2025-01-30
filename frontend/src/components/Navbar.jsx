@@ -2,11 +2,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Menu, X, User, ArrowRight } from "lucide-react";
+import { Search, Menu, X, User, ArrowRight, Bookmark } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
 import { signOut } from '../redux/user/userSlice';
-import { BookmarksDropdown } from './BookmarksDropdown';
-import { ProfileDropdown } from './ProfileDropdown';
+import { ProfileOverlay } from './ProfileOverlay';
+import { BookmarksOverlay } from './BookmarksOverlay';
 
 // ArrowRight Icon Component
 
@@ -165,6 +165,8 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -235,19 +237,9 @@ const Navbar = () => {
 
             {/* Right Section */}
             <div className="hidden md:flex items-center space-x-4">
-              {/* Enhanced Search Button */}
-              <motion.div
-                className="relative group"
-                whileHover={{ scale: 1.05 }}
-              >
-                {/* Gradient background effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#2997ff]/20 via-[#30d158]/20 to-[#ff375f]/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300" />
-                
-                {/* Search button with glass effect */}
-                <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10"
-                >
+              {/* Search Button */}
+              <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
+                <button onClick={() => setIsSearchOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
                   <Search className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
                   <span className="text-sm text-gray-400 group-hover:text-white">
                     Search
@@ -259,34 +251,30 @@ const Navbar = () => {
                 </button>
               </motion.div>
 
-              {currentUser && <BookmarksDropdown />}
-              
-              {currentUser ? (
-                <ProfileDropdown 
-                  currentUser={currentUser}
-                  onSignOut={handleSignOut}
-                />
-              ) : (
-                <div className="flex items-center gap-3">
-                  <Link to="/signin">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-4 py-1.5 text-gray-300 hover:text-white text-sm font-medium"
-                    >
-                      Sign in
-                    </motion.button>
-                  </Link>
-                  <Link to="/signup">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="px-4 py-1.5 bg-[#2997ff] hover:bg-[#2997ff]/90 text-white rounded-full text-sm font-medium transition-colors"
-                    >
-                      Get Started
-                    </motion.button>
-                  </Link>
-                </div>
+              {/* Bookmarks Button */}
+              {currentUser && (
+                <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
+                  <button onClick={() => setIsBookmarksOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
+                    <Bookmark className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                    <span className="text-sm text-gray-400 group-hover:text-white">
+                      Bookmarks
+                    </span>
+                  </button>
+                </motion.div>
+              )}
+
+              {/* Profile Button */}
+              {currentUser && (
+                <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
+                  <button onClick={() => setIsProfileOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
+                    <div className="w-8 h-8 rounded-full">
+                      {currentUser.username.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm text-gray-400 group-hover:text-white">
+                      {currentUser.username}
+                    </span>
+                  </button>
+                </motion.div>
               )}
             </div>
 
@@ -373,10 +361,14 @@ const Navbar = () => {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Add Search Overlay */}
-      <SearchOverlay 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
+      {/* Overlays */}
+      <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <BookmarksOverlay isOpen={isBookmarksOpen} onClose={() => setIsBookmarksOpen(false)} />
+      <ProfileOverlay 
+        isOpen={isProfileOpen} 
+        onClose={() => setIsProfileOpen(false)}
+        currentUser={currentUser}
+        onSignOut={handleSignOut}
       />
     </>
   );

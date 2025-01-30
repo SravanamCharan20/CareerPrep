@@ -3,10 +3,8 @@ import { Link } from 'react-router-dom';
 import { Globe, Server, Smartphone, Brain, ArrowRight, Search, SlidersHorizontal, Bookmark } from 'lucide-react';
 import { useState } from 'react';
 import { useUserInteractions } from '../hooks/useUserInteractions';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateRoadmapProgress } from '../redux/user/userSlice';
+import { useSelector } from 'react-redux';
 import { useRoadmapProgress } from '../hooks/useRoadmapProgress';
-import { useActivityTracking } from '../hooks/useActivityTracking';
 
 const roadmaps = [
   {
@@ -62,7 +60,6 @@ export default function Roadmaps() {
   const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
   const { roadmapProgress } = useRoadmapProgress();
   const { userInteractions } = useSelector(state => state.user);
-  const { trackRoadmapProgress } = useActivityTracking();
 
   // Add loading state
   if (!userInteractions) {
@@ -116,12 +113,7 @@ export default function Roadmaps() {
     }
     if (selectedFilter === 'all') return true;
     return roadmap.id === selectedFilter;
-  });
-
-  const handleNodeComplete = (roadmap, node) => {
-    trackRoadmapProgress(roadmap, node);
-  };
-
+  })
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
@@ -315,7 +307,7 @@ export default function Roadmaps() {
                       </div>
 
                       {/* Status Badge */}
-                      <div className="absolute top-4 left-4">
+                      <div className="absolute top-5 right-20">
                         <span 
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
                             (roadmapProgress[roadmap.id]?.progress || 0) === 100

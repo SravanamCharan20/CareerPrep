@@ -1,17 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Code, Brain, Plus, ArrowRight, Search, SlidersHorizontal, Bookmark } from 'lucide-react';
+import { Code, Brain, Plus, ArrowRight, Search, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { useUserInteractions } from '../hooks/useUserInteractions';
 import { useNavigate } from 'react-router-dom';
-import { useActivityTracking } from '../hooks/useActivityTracking';
 
 export default function Projects() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
-  const { handleBookmark, isBookmarked } = useUserInteractions();
-  const { trackProjectProgress } = useActivityTracking();
 
   const projectCategories = [
     {
@@ -78,26 +74,6 @@ export default function Projects() {
     return true;
   });
 
-  const handleSaveCategory = (e, category) => {
-    e.stopPropagation(); // Prevent navigation when clicking save button
-    handleBookmark({
-      id: category.title.toLowerCase().replace(/\s+/g, '-'),
-      title: category.title,
-      path: category.path,
-      type: 'project-category',
-      description: category.description,
-      icon: category.icon
-    });
-    trackProjectProgress(category, 0);
-  };
-
-  const handleProjectStart = (project) => {
-    trackProjectProgress(project, 0);
-  };
-
-  const handleProgressUpdate = (project, progress) => {
-    trackProjectProgress(project, progress);
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -238,23 +214,6 @@ export default function Projects() {
                   className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
                 />
               </div>
-
-              {/* Save Button */}
-              {!category.disabled && (
-                <button
-                  onClick={(e) => handleSaveCategory(e, category)}
-                  className="absolute top-4 right-4 p-2 hover:bg-white/5 rounded-full transition-colors z-10"
-                >
-                  <Bookmark 
-                    className={`w-5 h-5 ${
-                      isBookmarked(category.title.toLowerCase().replace(/\s+/g, '-')) 
-                        ? 'fill-[#2997ff] text-[#2997ff]' 
-                        : 'text-gray-400'
-                    }`}
-                  />
-                </button>
-              )}
-
               {/* Content */}
               <div className="relative h-full p-8 flex flex-col">
                 {/* Icon */}

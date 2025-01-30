@@ -132,13 +132,12 @@ export const ProfileDropdown = ({ currentUser, onSignOut }) => {
     // Add backdrop click handler
 
     return (
-        <div className="relative">
-            {/* Profile Button with glass effect */}
+        <>
+            {/* Profile Button */}
             <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
                 {/* Gradient background effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-[#2997ff]/20 via-[#30d158]/20 to-[#ff375f]/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300" />
                 
-                {/* Button with glass effect */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10"
@@ -154,10 +153,11 @@ export const ProfileDropdown = ({ currentUser, onSignOut }) => {
                 </button>
             </motion.div>
 
+            {/* Full Page Overlay */}
             <AnimatePresence>
                 {isOpen && (
                     <>
-                        {/* Enhanced Backdrop with blur */}
+                        {/* Backdrop */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -166,12 +166,12 @@ export const ProfileDropdown = ({ currentUser, onSignOut }) => {
                             onClick={() => setIsOpen(false)}
                         />
 
-                        {/* Enhanced Modal */}
+                        {/* Content */}
                         <motion.div
                             initial={{ opacity: 0, y: -50 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -50 }}
-                            className="fixed top-4 inset-x-4 md:top-8 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/10 p-6 z-50 w-full max-w-2xl shadow-2xl"
+                            className="fixed inset-x-4 top-20 md:top-24 md:left-1/2 md:-translate-x-1/2 bg-black/90 backdrop-blur-xl rounded-2xl border border-white/10 p-6 z-50 w-full max-w-4xl shadow-2xl mx-auto"
                         >
                             {/* User Info */}
                             <div className="flex items-center gap-4 p-4 mb-6 bg-white/5 rounded-xl">
@@ -273,7 +273,7 @@ export const ProfileDropdown = ({ currentUser, onSignOut }) => {
                     </>
                 )}
             </AnimatePresence>
-        </div>
+        </>
     );
 };
 
