@@ -67,51 +67,72 @@ const SearchOverlay = ({ isOpen, onClose }) => {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
+          {/* Enhanced Backdrop with blur */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50"
             onClick={onClose}
           />
 
-          {/* Search Modal */}
+          {/* Enhanced Search Modal */}
           <motion.div
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
-            className="fixed top-0 left-0 right-0 bg-[#1c1c1e] border-b border-white/10 p-4 z-50"
+            className="fixed top-4 inset-x-4 md:top-8 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 bg-[#1c1c1e]/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 z-50 w-full max-w-3xl shadow-2xl"
           >
-            <div className="max-w-3xl mx-auto">
-              <form onSubmit={handleSearch} className="relative">
+            {/* Search Form with Gradient Border */}
+            <div className="relative group">
+              {/* Animated gradient background */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#2997ff] via-[#30d158] to-[#ff375f] rounded-xl blur opacity-30 group-hover:opacity-50 transition duration-1000 group-hover:duration-200 animate-gradient-xy"></div>
+              
+              <form onSubmit={handleSearch} className="relative bg-black/50 rounded-xl">
                 <input
                   ref={inputRef}
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search projects, roadmaps, certifications..."
-                  className="w-full bg-black/50 text-white placeholder-gray-400 rounded-xl px-12 py-3 focus:outline-none focus:ring-2 focus:ring-[#2997ff]"
+                  className="w-full bg-transparent text-white placeholder-gray-400 px-12 py-4 rounded-xl focus:outline-none"
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 {searchQuery && (
-                  <button
+                  <motion.button
                     type="submit"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-[#2997ff] hover:text-[#2997ff]/80 transition-colors"
                   >
                     <ArrowRight className="w-5 h-5" />
-                  </button>
+                  </motion.button>
                 )}
               </form>
-              
-              {/* Quick Links */}
-              <div className="mt-4 border-t border-white/10 pt-4">
-                <h3 className="text-sm font-medium text-gray-400 mb-2">Quick Links</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  <QuickLink href="/projects" label="Projects" />
-                  <QuickLink href="/roadmaps" label="Roadmaps" />
-                  <QuickLink href="/certifications" label="Certifications" />
-                  <QuickLink href="/hackathons" label="Hackathons" />
+            </div>
+
+            {/* Enhanced Quick Links */}
+            <div className="mt-6">
+              <h3 className="text-sm font-medium text-gray-400 mb-3">Quick Links</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <QuickLink href="/projects" label="Projects" />
+                <QuickLink href="/roadmaps" label="Roadmaps" />
+                <QuickLink href="/certifications" label="Certifications" />
+                <QuickLink href="/hackathons" label="Hackathons" />
+              </div>
+            </div>
+
+            {/* Keyboard Shortcuts */}
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <div className="flex items-center justify-between text-sm text-gray-400">
+                <div className="flex items-center gap-2">
+                  <kbd className="px-2 py-1 bg-white/5 rounded-lg">⌘</kbd>
+                  <kbd className="px-2 py-1 bg-white/5 rounded-lg">K</kbd>
+                  <span>to search</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <kbd className="px-2 py-1 bg-white/5 rounded-lg">ESC</kbd>
+                  <span>to close</span>
                 </div>
               </div>
             </div>
@@ -125,10 +146,13 @@ const SearchOverlay = ({ isOpen, onClose }) => {
 const QuickLink = ({ href, label }) => (
   <Link
     to={href}
-    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-sm text-gray-300 hover:text-white"
+    className="group relative overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
   >
-    <span>{label}</span>
-    <ArrowRight className="w-4 h-4" />
+    <div className="absolute inset-0 bg-gradient-to-r from-[#2997ff]/20 via-[#30d158]/20 to-[#ff375f]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+    <div className="relative flex items-center justify-between p-3">
+      <span className="text-sm text-gray-300 group-hover:text-white transition-colors">{label}</span>
+      <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors transform group-hover:translate-x-1 duration-200" />
+    </div>
   </Link>
 );
 
@@ -148,6 +172,22 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Add keyboard shortcut handler
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      }
+      if (e.key === 'Escape' && isSearchOpen) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchOpen]);
 
   const handleSignOut = () => {
     dispatch(signOut());
@@ -194,14 +234,30 @@ const Navbar = () => {
 
             {/* Right Section */}
             <div className="hidden md:flex items-center space-x-4">
-              <motion.button 
+              {/* Enhanced Search Button */}
+              <motion.div
+                className="relative group"
                 whileHover={{ scale: 1.05 }}
-                className="p-2 hover:bg-white/5 rounded-full transition-colors"
-                onClick={() => setIsSearchOpen(true)}
               >
-                <Search className="w-5 h-5 text-gray-400" />
-              </motion.button>
-              
+                {/* Gradient background effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#2997ff]/20 via-[#30d158]/20 to-[#ff375f]/20 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300" />
+                
+                {/* Search button with glass effect */}
+                <button
+                  onClick={() => setIsSearchOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10"
+                >
+                  <Search className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                  <span className="text-sm text-gray-400 group-hover:text-white">
+                    Search
+                  </span>
+                  <div className="flex items-center gap-1 pl-2 border-l border-white/10">
+                    <kbd className="text-xs px-1.5 py-0.5 bg-white/5 text-gray-400 rounded">⌘</kbd>
+                    <kbd className="text-xs px-1.5 py-0.5 bg-white/5 text-gray-400 rounded">K</kbd>
+                  </div>
+                </button>
+              </motion.div>
+
               {currentUser && <BookmarksDropdown />}
               
               {currentUser ? (
