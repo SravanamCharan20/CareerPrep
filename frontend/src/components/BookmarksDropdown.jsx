@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bookmark, X, Brain, Code, Award, Trophy, Briefcase, Map, ArrowRight } from 'lucide-react';
 import { useUserInteractions } from '../hooks/useUserInteractions';
+import { useActivityTracking } from '../hooks/useActivityTracking';
 
 const getCategoryIcon = (category) => {
     switch (category) {
@@ -25,6 +26,7 @@ const getCategoryIcon = (category) => {
 export const BookmarksDropdown = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { bookmarks, handleRemoveBookmark } = useUserInteractions();
+    const { trackBookmark } = useActivityTracking();
 
     // Group bookmarks by category
     const groupedBookmarks = bookmarks.reduce((acc, item) => {
@@ -34,6 +36,10 @@ export const BookmarksDropdown = () => {
         acc[item.category].push(item);
         return acc;
     }, {});
+
+    const handleBookmarkClick = (bookmark) => {
+        trackBookmark(bookmark);
+    };
 
     return (
         <div className="relative">
@@ -120,7 +126,10 @@ export const BookmarksDropdown = () => {
                                                                 <Link
                                                                     to={item.path}
                                                                     className="flex-1 min-w-0"
-                                                                    onClick={() => setIsOpen(false)}
+                                                                    onClick={() => {
+                                                                        setIsOpen(false);
+                                                                        handleBookmarkClick(item);
+                                                                    }}
                                                                 >
                                                                     <p className="text-sm text-gray-300 hover:text-white truncate">
                                                                         {item.title}
@@ -132,7 +141,10 @@ export const BookmarksDropdown = () => {
                                                                     )}
                                                                 </Link>
                                                                 <button
-                                                                    onClick={() => handleRemoveBookmark(item.id)}
+                                                                    onClick={() => {
+                                                                        handleRemoveBookmark(item.id);
+                                                                        handleBookmarkClick(item);
+                                                                    }}
                                                                     className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-white/10 rounded-full transition-all"
                                                                 >
                                                                     <X className="w-4 h-4 text-gray-400" />

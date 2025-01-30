@@ -3,13 +3,9 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
     User, 
-    ChevronDown, 
-    Settings, 
-    BarChart2,
+    ChevronDown, BarChart2,
     Clock,
-    LogOut,
-    Trophy,
-    Star
+    LogOut
 } from 'lucide-react';
 import PropTypes from 'prop-types';
 
@@ -37,30 +33,7 @@ export const ProfileDropdown = ({ currentUser, onSignOut }) => {
             path: '/activity',
             color: '#ff375f',
             description: 'See your recent actions'
-        },
-        {
-            title: 'Settings',
-            icon: Settings,
-            path: '/settings',
-            color: '#bf5af2',
-            description: 'Customize your experience'
-        }
-    ];
-
-    const stats = [
-        {
-            label: 'Projects',
-            value: '12',
-            icon: Star,
-            color: '#2997ff'
-        },
-        {
-            label: 'Hackathons',
-            value: '3',
-            icon: Trophy,
-            color: '#30d158'
-        }
-    ];
+        }];
 
     return (
         <div className="relative">
@@ -109,20 +82,7 @@ export const ProfileDropdown = ({ currentUser, onSignOut }) => {
                                         <h3 className="font-semibold text-white">{currentUser.username}</h3>
                                         <p className="text-sm text-gray-400">{currentUser.email}</p>
                                     </div>
-                                </div>
-                                <div className="mt-4 grid grid-cols-2 gap-2">
-                                    {stats.map((stat) => (
-                                        <div key={stat.label} className="p-3 rounded-lg bg-white/5">
-                                            <div className="flex items-center gap-2">
-                                                <stat.icon className="w-4 h-4" style={{ color: stat.color }} />
-                                                <span className="text-sm text-gray-400">{stat.label}</span>
-                                            </div>
-                                            <p className="mt-1 text-lg font-semibold text-white">{stat.value}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
+                                </div></div>
                             <div className="p-2">
                                 {menuItems.map((item) => (
                                     <Link

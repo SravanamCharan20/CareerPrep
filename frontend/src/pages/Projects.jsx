@@ -3,6 +3,7 @@ import { Code, Brain, Plus, ArrowRight, Search, SlidersHorizontal, Bookmark } fr
 import { useState } from 'react';
 import { useUserInteractions } from '../hooks/useUserInteractions';
 import { useNavigate } from 'react-router-dom';
+import { useActivityTracking } from '../hooks/useActivityTracking';
 
 export default function Projects() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Projects() {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const { handleBookmark, isBookmarked } = useUserInteractions();
+  const { trackProjectProgress } = useActivityTracking();
 
   const projectCategories = [
     {
@@ -86,6 +88,15 @@ export default function Projects() {
       description: category.description,
       icon: category.icon
     });
+    trackProjectProgress(category, 0);
+  };
+
+  const handleProjectStart = (project) => {
+    trackProjectProgress(project, 0);
+  };
+
+  const handleProgressUpdate = (project, progress) => {
+    trackProjectProgress(project, progress);
   };
 
   return (

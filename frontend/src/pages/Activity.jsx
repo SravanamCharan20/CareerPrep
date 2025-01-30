@@ -1,17 +1,21 @@
 import { motion } from 'framer-motion';
-import { Award, BookMarked, Code, Target, Clock, ArrowRight } from 'lucide-react';
+import { Award, BookMarked, Code, Target, Clock, ArrowRight, Brain, Star, Book } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import React from 'react';
 
 const activityIcons = {
     'completion': Award,
     'saved': BookMarked,
     'progress': Target,
-    'project': Code
+    'project': Code,
+    'quiz': Brain,
+    'skill': Star,
+    'course': Book
 };
 
-export default function Activity() {
+const Activity = () => {
     const { userInteractions } = useSelector(state => state.user);
     const activities = userInteractions?.activities || [];
 
@@ -29,23 +33,38 @@ export default function Activity() {
         );
     }
 
-    const getActivityIcon = (type) => {
-        return activityIcons[type] || Clock;
-    };
-
-    const getActivityColor = (type) => {
-        switch (type) {
-            case 'completion':
-                return '#2997ff';
-            case 'saved':
-                return '#30d158';
-            case 'progress':
-                return '#ff375f';
-            case 'project':
-                return '#bf5af2';
-            default:
-                return '#2997ff';
-        }
+    const getActivityStyle = (type) => {
+        const styles = {
+            completion: {
+                color: '#2997ff',
+                bgColor: '#2997ff15'
+            },
+            saved: {
+                color: '#30d158',
+                bgColor: '#30d15815'
+            },
+            progress: {
+                color: '#ff375f',
+                bgColor: '#ff375f15'
+            },
+            project: {
+                color: '#bf5af2',
+                bgColor: '#bf5af215'
+            },
+            quiz: {
+                color: '#ffd60a',
+                bgColor: '#ffd60a15'
+            },
+            skill: {
+                color: '#5e5ce6',
+                bgColor: '#5e5ce615'
+            },
+            course: {
+                color: '#ff9f0a',
+                bgColor: '#ff9f0a15'
+            }
+        };
+        return styles[type] || styles.progress;
     };
 
     return (
@@ -71,12 +90,11 @@ export default function Activity() {
                         </div>
                     ) : (
                         activities.map((activity, index) => {
-                            const Icon = getActivityIcon(activity.type);
-                            const color = getActivityColor(activity.type);
+                            const style = getActivityStyle(activity.type);
 
                             return (
                                 <motion.div
-                                    key={activity.timestamp}
+                                    key={activity.id}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
@@ -84,12 +102,12 @@ export default function Activity() {
                                 >
                                     <div 
                                         className="w-12 h-12 rounded-xl flex items-center justify-center"
-                                        style={{ backgroundColor: `${color}15` }}
+                                        style={{ backgroundColor: style.bgColor }}
                                     >
-                                        <Icon 
-                                            className="w-6 h-6"
-                                            style={{ color }}
-                                        />
+                                        {React.createElement(activityIcons[activity.type] || Clock, {
+                                            className: "w-6 h-6",
+                                            style: { color: style.color }
+                                        })}
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-medium">{activity.title}</h3>
@@ -118,4 +136,6 @@ export default function Activity() {
             </div>
         </div>
     );
-} 
+};
+
+export default Activity; 

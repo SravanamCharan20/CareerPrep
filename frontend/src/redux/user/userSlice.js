@@ -283,14 +283,31 @@ const userSlice = createSlice({
             localStorage.setItem(`userInteractions_${state.currentUser._id}`, JSON.stringify(state.userInteractions));
         },
         addActivity: (state, action) => {
-            state.userInteractions.activities.unshift({
-                ...action.payload,
-                timestamp: new Date().toISOString()
-            });
+            if (!state.userInteractions.activities) {
+                state.userInteractions.activities = [];
+            }
+            
+            // Add new activity with timestamp and unique ID
+            const newActivity = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                ...action.payload
+            };
+            
+            state.userInteractions.activities.unshift(newActivity);
+            
+            // Keep only last 50 activities
             if (state.userInteractions.activities.length > 50) {
                 state.userInteractions.activities.pop();
             }
-            localStorage.setItem(`userInteractions_${state.currentUser._id}`, JSON.stringify(state.userInteractions));
+
+            // Save to localStorage if user is logged in
+            if (state.currentUser) {
+                localStorage.setItem(
+                    `userInteractions_${state.currentUser._id}`,
+                    JSON.stringify(state.userInteractions)
+                );
+            }
         },
         addNotification: (state, action) => {
             state.userInteractions.notifications.unshift({

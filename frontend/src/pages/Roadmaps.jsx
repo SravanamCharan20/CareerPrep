@@ -6,6 +6,7 @@ import { useUserInteractions } from '../hooks/useUserInteractions';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateRoadmapProgress } from '../redux/user/userSlice';
 import { useRoadmapProgress } from '../hooks/useRoadmapProgress';
+import { useActivityTracking } from '../hooks/useActivityTracking';
 
 const roadmaps = [
   {
@@ -61,6 +62,7 @@ export default function Roadmaps() {
   const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
   const { roadmapProgress } = useRoadmapProgress();
   const { userInteractions } = useSelector(state => state.user);
+  const { trackRoadmapProgress } = useActivityTracking();
 
   // Add loading state
   if (!userInteractions) {
@@ -115,6 +117,10 @@ export default function Roadmaps() {
     if (selectedFilter === 'all') return true;
     return roadmap.id === selectedFilter;
   });
+
+  const handleNodeComplete = (roadmap, node) => {
+    trackRoadmapProgress(roadmap, node);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">

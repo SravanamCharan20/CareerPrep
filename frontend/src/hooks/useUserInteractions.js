@@ -3,14 +3,17 @@ import {
     addBookmark,
     removeBookmark,
 } from '../redux/user/userSlice';
+import { useActivityTracking } from './useActivityTracking';
 
 export const useUserInteractions = () => {
     const dispatch = useDispatch();
     const { currentUser, userInteractions } = useSelector(state => state.user);
+    const { trackBookmark } = useActivityTracking();
 
     const handleBookmark = (item) => {
         if (!currentUser) return false;
         dispatch(addBookmark(item));
+        trackBookmark(item);
         return true;
     };
 

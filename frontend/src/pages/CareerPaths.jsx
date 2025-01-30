@@ -12,6 +12,7 @@ import {
 import React from 'react';
 import * as careerPaths from '../data/careerpaths';
 import { useUserInteractions } from '../hooks/useUserInteractions';
+import { useActivityTracking } from '../hooks/useActivityTracking';
 
 const CareerPaths = () => {
   const [selectedPath, setSelectedPath] = useState(null);
@@ -20,6 +21,7 @@ const CareerPaths = () => {
   const [filteredPaths, setFilteredPaths] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
+  const { trackCareerPathExplored } = useActivityTracking();
 
   // Memoize allPaths to prevent unnecessary recalculations
   const allPaths = useMemo(() => Object.values(careerPaths), []);
@@ -99,6 +101,12 @@ const CareerPaths = () => {
   useEffect(() => {
     setFilteredPaths(allPaths);
   }, [allPaths]);
+
+  // Add activity tracking when a career path is selected
+  const handlePathSelect = (path) => {
+    setSelectedPath(path);
+    trackCareerPathExplored(path);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -237,7 +245,7 @@ const CareerPaths = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   className="relative group"
-                  onClick={() => setSelectedPath(path)}
+                  onClick={() => handlePathSelect(path)}
                 >
                   {/* Bookmark Button */}
                   <div 
