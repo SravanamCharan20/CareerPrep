@@ -1,24 +1,55 @@
 import { motion } from 'framer-motion';
-import { User, Mail, Calendar, Edit, Camera } from 'lucide-react';
+import { User, Mail, Calendar, Edit, Camera, Code, Brain, Award, Book } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
 
-export default function Profile() {
+const Profile = () => {
     const { currentUser, userInteractions } = useSelector(state => state.user);
     const [isEditing, setIsEditing] = useState(false);
 
-    const stats = [
+    if (!userInteractions) {
+        return (
+            <div className="min-h-screen bg-black text-white pt-20">
+                <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="bg-[#1c1c1e] rounded-xl p-8 text-center">
+                        <div className="w-12 h-12 border-4 border-t-[#2997ff] border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin mx-auto mb-4" />
+                        <p className="text-gray-400">Loading profile...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Initialize required data with defaults
+    const completedProjects = userInteractions?.completedProjects || [];
+    const savedCertifications = userInteractions?.savedCertifications || [];
+    const projectProgress = userInteractions?.projectProgress || {};
+    const roadmapProgress = userInteractions?.roadmapProgress || {};
+
+    const learningStats = [
         {
-            label: 'Projects Completed',
-            value: userInteractions.completedProjects.length
+            label: 'Projects',
+            value: completedProjects.length,
+            icon: Code,
+            color: '#2997ff'
         },
         {
             label: 'Certifications',
-            value: userInteractions.savedCertifications.length
+            value: savedCertifications.length,
+            icon: Award,
+            color: '#30d158'
         },
         {
-            label: 'Days Streak',
-            value: '5'
+            label: 'Learning Hours',
+            value: Math.round(userInteractions?.stats?.totalTimeSpent / 60) || 0,
+            icon: Book,
+            color: '#ff375f'
+        },
+        {
+            label: 'Skills Unlocked',
+            value: userInteractions?.unlockedSkills?.length || 0,
+            icon: Brain,
+            color: '#bf5af2'
         }
     ];
 
@@ -56,10 +87,11 @@ export default function Profile() {
                     </button>
                 </div>
 
-                {/* Profile Info */}
+                {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Column - User Info */}
                     <div className="lg:col-span-2 space-y-6">
+                        {/* Profile Information */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -84,26 +116,34 @@ export default function Profile() {
                                 <div className="flex items-center gap-3">
                                     <Calendar className="w-5 h-5 text-[#2997ff]" />
                                     <div>
-                                        <p className="text-sm text-gray-400">Joined</p>
-                                        <p className="font-medium">January 2024</p>
+                                        <p className="text-sm text-gray-400">Member Since</p>
+                                        <p className="font-medium">
+                                            {new Date(currentUser.createdAt).toLocaleDateString()}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </motion.div>
 
-                        {/* Stats */}
+                        {/* Learning Stats */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="grid grid-cols-3 gap-4"
+                            className="grid grid-cols-2 sm:grid-cols-4 gap-4"
                         >
-                            {stats.map((stat) => (
+                            {learningStats.map((stat) => (
                                 <div 
                                     key={stat.label}
-                                    className="bg-[#1c1c1e] rounded-xl p-4 text-center"
+                                    className="bg-[#1c1c1e] rounded-xl p-4"
                                 >
-                                    <p className="text-2xl font-bold text-[#2997ff]">{stat.value}</p>
+                                    <div 
+                                        className="w-10 h-10 rounded-xl mb-3 flex items-center justify-center"
+                                        style={{ backgroundColor: `${stat.color}15` }}
+                                    >
+                                        <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
+                                    </div>
+                                    <p className="text-2xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
                                     <p className="text-sm text-gray-400">{stat.label}</p>
                                 </div>
                             ))}
@@ -115,28 +155,54 @@ export default function Profile() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="bg-[#1c1c1e] rounded-xl p-6"
+                        className="space-y-6"
                     >
-                        <h2 className="text-xl font-semibold mb-4">Learning Progress</h2>
-                        <div className="space-y-4">
-                            {Object.entries(userInteractions.projectProgress).map(([key, value]) => (
-                                <div key={key}>
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span className="text-gray-400">{key}</span>
-                                        <span className="text-[#2997ff]">{value}%</span>
+                        {/* Roadmap Progress */}
+                        <div className="bg-[#1c1c1e] rounded-xl p-6">
+                            <h2 className="text-xl font-semibold mb-4">Learning Paths</h2>
+                            <div className="space-y-4">
+                                {Object.entries(roadmapProgress).map(([key, data]) => (
+                                    <div key={key}>
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="text-gray-400 capitalize">{key}</span>
+                                            <span className="text-[#2997ff]">{data.progress}%</span>
+                                        </div>
+                                        <div className="w-full bg-white/5 rounded-full h-2">
+                                            <div 
+                                                className="bg-[#2997ff] h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${data.progress}%` }}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="w-full bg-white/5 rounded-full h-2">
-                                        <div 
-                                            className="bg-[#2997ff] h-2 rounded-full transition-all duration-300"
-                                            style={{ width: `${value}%` }}
-                                        />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Project Progress */}
+                        <div className="bg-[#1c1c1e] rounded-xl p-6">
+                            <h2 className="text-xl font-semibold mb-4">Project Progress</h2>
+                            <div className="space-y-4">
+                                {Object.entries(projectProgress).map(([key, value]) => (
+                                    <div key={key}>
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="text-gray-400">{key}</span>
+                                            <span className="text-[#30d158]">{value}%</span>
+                                        </div>
+                                        <div className="w-full bg-white/5 rounded-full h-2">
+                                            <div 
+                                                className="bg-[#30d158] h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${value}%` }}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </motion.div>
                 </div>
             </div>
         </div>
     );
-} 
+};
+
+export default Profile; 

@@ -89,15 +89,16 @@ const Activity = () => {
                             </Link>
                         </div>
                     ) : (
-                        activities.map((activity, index) => {
+                        activities.map((activity) => {
                             const style = getActivityStyle(activity.type);
+                            // Ensure each activity has a unique key by using timestamp if id is not available
+                            const key = activity.id || new Date(activity.timestamp).getTime();
 
                             return (
                                 <motion.div
-                                    key={activity.id}
+                                    key={key}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: index * 0.1 }}
                                     className="bg-[#1c1c1e] rounded-xl p-6 flex items-center gap-4"
                                 >
                                     <div 

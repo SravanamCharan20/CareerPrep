@@ -16,6 +16,10 @@ const loadUserInteractions = () => {
 
 const defaultInteractions = {
     bookmarks: [],
+    activities: [],
+    completedProjects: [],
+    savedCertifications: [],
+    projectProgress: {},
     preferences: {
         theme: 'dark',
         notifications: true,
@@ -44,8 +48,9 @@ const defaultInteractions = {
             totalNodes: 0
         }
     },
-    activities: [],
     stats: {
+        totalProgress: 0,
+        daysStreak: 0,
         totalTimeSpent: 0
     }
 };

@@ -1,17 +1,18 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Calendar, MapPin, Users, ArrowRight, ExternalLink, Code, Trophy, Bookmark } from "lucide-react";
 import { useUserInteractions } from '../hooks/useUserInteractions';
 
-// eslint-disable-next-line react/prop-types
+ 
 const HackathonCard = ({ hackathon }) => {
   // Add prop types validation at the top
-  // eslint-disable-next-line react/prop-types
+   
   const { images, status, participants, title, start_date, location, links, details } = hackathon;
 
   // Extract Devfolio link if it exists
   const getDevfolioLink = (links) => {
-    // eslint-disable-next-line react/prop-types
+     
     return links?.find(link => 
       link.toLowerCase().includes('devfolio.co') || 
       link.toLowerCase().includes('hack.') ||
@@ -138,7 +139,6 @@ const HackathonsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all"); // all, upcoming, past
 
-  const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
 
   useEffect(() => {
     const fetchHackathons = async () => {
@@ -168,7 +168,7 @@ const HackathonsPage = () => {
     });
 
   return (
-    <div className="min-h-screen bg-black text-white pt-20">
+    <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
       <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
         {/* Animated Background */}
