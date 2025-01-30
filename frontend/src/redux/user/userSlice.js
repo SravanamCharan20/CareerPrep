@@ -15,21 +15,7 @@ const loadUserInteractions = () => {
 };
 
 const defaultInteractions = {
-    savedProjects: [],
-    savedHackathons: [],
-    savedCertifications: [],
     bookmarks: [],
-    completedProjects: [],
-    projectProgress: {},
-    notes: {},
-    notifications: [],
-    activities: [],
-    stats: {
-        projectsCompleted: 0,
-        learningStreak: 0,
-        totalTimeSpent: 0,
-        certifications: 0
-    },
     preferences: {
         theme: 'dark',
         notifications: true,
@@ -87,21 +73,7 @@ const userSlice = createSlice({
             
             // Initialize user interactions
             state.userInteractions = {
-                savedProjects: [],
-                savedHackathons: [],
-                savedCertifications: [],
                 bookmarks: [],
-                completedProjects: [],
-                projectProgress: {},
-                notes: {},
-                notifications: [],
-                activities: [],
-                stats: {
-                    projectsCompleted: 0,
-                    learningStreak: 0,
-                    totalTimeSpent: 0,
-                    certifications: 0
-                },
                 preferences: {
                     theme: 'dark',
                     notifications: true,
@@ -251,7 +223,12 @@ const userSlice = createSlice({
                 ...state.userInteractions.preferences,
                 ...action.payload
             };
-            localStorage.setItem('userInteractions', JSON.stringify(state.userInteractions));
+            if (state.currentUser) {
+                localStorage.setItem(
+                    `userInteractions_${state.currentUser._id}`,
+                    JSON.stringify(state.userInteractions)
+                );
+            }
         },
         markProjectCompleted: (state, action) => {
             if (!state.userInteractions.completedProjects.includes(action.payload)) {

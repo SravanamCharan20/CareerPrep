@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search, Menu, X, User, ArrowRight } from "lucide-react";
 import { useSelector, useDispatch } from 'react-redux';
 import { signOut } from '../redux/user/userSlice';
-import { SavedContentDropdown } from './SavedContentDropdown';
+import { BookmarksDropdown } from './BookmarksDropdown';
 import { ProfileDropdown } from './ProfileDropdown';
 
 // ArrowRight Icon Component
@@ -202,7 +202,7 @@ const Navbar = () => {
                 <Search className="w-5 h-5 text-gray-400" />
               </motion.button>
               
-              {currentUser && <SavedContentDropdown />}
+              {currentUser && <BookmarksDropdown />}
               
               {currentUser ? (
                 <ProfileDropdown 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Calendar, MapPin, Users, ArrowRight, ExternalLink, Code, Trophy } from "lucide-react";
+import { Search, Calendar, MapPin, Users, ArrowRight, ExternalLink, Code, Trophy, Bookmark } from "lucide-react";
+import { useUserInteractions } from '../hooks/useUserInteractions';
 
 // eslint-disable-next-line react/prop-types
 const HackathonCard = ({ hackathon }) => {
@@ -19,6 +20,8 @@ const HackathonCard = ({ hackathon }) => {
   };
 
   const devfolioLink = getDevfolioLink(links || []);
+
+  const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
 
   return (
     <motion.div
@@ -98,6 +101,31 @@ const HackathonCard = ({ hackathon }) => {
               Learn more <ArrowRight className="w-4 h-4" />
             </motion.button>
           )}
+
+          <div className="absolute top-4 right-4">
+            <button
+              onClick={() => isBookmarked(hackathon._id) 
+                ? handleRemoveBookmark(hackathon._id)
+                : handleBookmark({
+                    id: hackathon._id,
+                    title: hackathon.title,
+                    path: `/hackathons/${hackathon._id}`,
+                    category: 'Hackathons',
+                    description: hackathon.details,
+                    date: hackathon.start_date
+                  })
+              }
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <Bookmark 
+                className={`w-5 h-5 ${
+                  isBookmarked(hackathon._id) 
+                    ? 'text-[#ff375f] fill-[#ff375f]' 
+                    : 'text-gray-400'
+                }`} 
+              />
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -109,6 +137,8 @@ const HackathonsPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all"); // all, upcoming, past
+
+  const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
 
   useEffect(() => {
     const fetchHackathons = async () => {
@@ -138,7 +168,7 @@ const HackathonsPage = () => {
     });
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white pt-20">
       {/* Hero Section */}
       <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
         {/* Animated Background */}

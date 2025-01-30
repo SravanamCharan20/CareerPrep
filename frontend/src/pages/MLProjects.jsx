@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Github, Star, Code, ArrowRight, Search, ChevronLeft, ChevronRight, TrendingUp, ArrowLeftCircle } from 'lucide-react';
+import { Github, Star, Code, ArrowRight, Search, ChevronLeft, ChevronRight, TrendingUp, ArrowLeftCircle, Bookmark } from 'lucide-react';
+import { useUserInteractions } from '../hooks/useUserInteractions';
 
 function MLProjects() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ function MLProjects() {
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState('all'); // 'all', 'trending'
   const projectsPerPage = 9;
+  const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
 
   useEffect(() => {
     // Fetch the project data from the backend
@@ -73,94 +75,6 @@ function MLProjects() {
     }
 
     return pages;
-  };
-
-  // eslint-disable-next-line react/prop-types
-  const ProjectCard = ({ project }) => {
-    // Destructure with default values
-    const {
-      repo_name = 'Untitled Project',
-      description = 'No description provided.',
-      repo_link = '#',
-      stars = 0
-    } = project || {};
-
-    // Validate repo_link
-    const isValidUrl = (url) => {
-      try {
-        new URL(url);
-        return true;
-      } catch {
-        return false;
-      }
-    };
-
-    const validRepoLink = isValidUrl(repo_link) ? repo_link : '#';
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="group relative"
-      >
-        {/* Blue Glow Effect */}
-        <div className="absolute -inset-0.5 bg-[#2997ff] rounded-2xl opacity-0 group-hover:opacity-20 blur-lg transition-all duration-500" />
-        
-        <div className="relative bg-[#1d1d1f] rounded-2xl overflow-hidden group-hover:bg-[#2d2d2f] transition-colors duration-300">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Code className="w-5 h-5 text-[#2997ff]" />
-                <span className="text-sm font-medium text-gray-400">Machine Learning</span>
-              </div>
-              <div className="flex items-center gap-1 text-yellow-500">
-                <Star className="w-4 h-4 fill-current" />
-                <span className="text-sm font-medium">
-                  {typeof stars === 'number' ? stars.toLocaleString() : '0'}
-                </span>
-              </div>
-            </div>
-            
-            <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-[#2997ff] transition-colors line-clamp-1">
-              {repo_name}
-            </h3>
-            
-            <p className="text-gray-400 text-sm mb-6 line-clamp-2 min-h-[2.5rem]">
-              {description}
-            </p>
-
-            <div className="flex items-center justify-between pt-4 border-t border-[#424245]">
-              {validRepoLink !== '#' ? (
-                <a
-                  href={validRepoLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-[#2997ff] hover:text-white transition-colors text-sm"
-                >
-                  <Github className="w-4 h-4" />
-                  View Repository
-                </a>
-              ) : (
-                <span className="text-gray-500 text-sm flex items-center gap-2">
-                  <Github className="w-4 h-4" />
-                  No Repository Link
-                </span>
-              )}
-              
-              {validRepoLink !== '#' && (
-                <motion.div
-                  whileHover={{ x: 5 }}
-                  className="text-[#2997ff] cursor-pointer"
-                >
-                  <ArrowRight className="w-4 h-4" />
-                </motion.div>
-              )}
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    );
   };
 
   return (
@@ -244,7 +158,88 @@ function MLProjects() {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {currentProjects.map((project) => (
-                  <ProjectCard key={project.repo_link} project={project} />
+                  <motion.div
+                    key={project.repo_link}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-[#1c1c1e] rounded-xl overflow-hidden group relative"
+                  >
+                    <div className="absolute top-4 right-4 z-10">
+                      <button
+                        onClick={() => isBookmarked(project.repo_link) 
+                          ? handleRemoveBookmark(project.repo_link)
+                          : handleBookmark({
+                              id: project.repo_link,
+                              title: project.repo_name,
+                              path: project.repo_link,
+                              category: 'ML Projects',
+                              description: project.description,
+                              stars: project.stars
+                            })
+                      }
+                        className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                      >
+                        <Bookmark 
+                          className={`w-5 h-5 ${
+                            isBookmarked(project.repo_link) 
+                              ? 'text-[#2997ff] fill-[#2997ff]' 
+                              : 'text-gray-400'
+                          }`} 
+                        />
+                      </button>
+                    </div>
+
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Code className="w-5 h-5 text-[#2997ff]" />
+                          <span className="text-sm font-medium text-gray-400">Machine Learning</span>
+                        </div>
+                        <div className="flex items-center mr-10 gap-1 text-yellow-500">
+                          <Star className="w-4 h-4 fill-current" />
+                          <span className="text-sm font-medium">
+                            {typeof project.stars === 'number' ? project.stars.toLocaleString() : '0'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-semibold mb-3 text-white group-hover:text-[#2997ff] transition-colors line-clamp-1">
+                        {project.repo_name}
+                      </h3>
+                      
+                      <p className="text-gray-400 text-sm mb-6 line-clamp-2 min-h-[2.5rem]">
+                        {project.description}
+                      </p>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-[#424245]">
+                        {project.repo_link !== '#' ? (
+                          <a
+                            href={project.repo_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-[#2997ff] hover:text-white transition-colors text-sm"
+                          >
+                            <Github className="w-4 h-4" />
+                            View Repository
+                          </a>
+                        ) : (
+                          <span className="text-gray-500 text-sm flex items-center gap-2">
+                            <Github className="w-4 h-4" />
+                            No Repository Link
+                          </span>
+                        )}
+                        
+                        {project.repo_link !== '#' && (
+                          <motion.div
+                            whileHover={{ x: 5 }}
+                            className="text-[#2997ff] cursor-pointer"
+                          >
+                            <ArrowRight className="w-4 h-4" />
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
               

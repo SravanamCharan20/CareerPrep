@@ -5,10 +5,13 @@ import {
   SlidersHorizontal,
   ArrowRight,
   Code,
-  Brain
+  Brain,
+  Briefcase,
+  Bookmark
 } from 'lucide-react';
 import React from 'react';
 import * as careerPaths from '../data/careerpaths';
+import { useUserInteractions } from '../hooks/useUserInteractions';
 
 const CareerPaths = () => {
   const [selectedPath, setSelectedPath] = useState(null);
@@ -16,6 +19,7 @@ const CareerPaths = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [filteredPaths, setFilteredPaths] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
+  const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
 
   // Memoize allPaths to prevent unnecessary recalculations
   const allPaths = useMemo(() => Object.values(careerPaths), []);
@@ -228,13 +232,47 @@ const CareerPaths = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPaths.map((path, index) => (
                 <motion.div
-                  key={path.title}
+                  key={path.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 + 0.4 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="relative group"
                   onClick={() => setSelectedPath(path)}
-                  className="group relative aspect-[4/3] cursor-pointer"
                 >
+                  {/* Bookmark Button */}
+                  <div 
+                    className="absolute top-4 right-4 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent opening the modal when clicking bookmark
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        if (isBookmarked(path.id)) {
+                          handleRemoveBookmark(path.id);
+                        } else {
+                          handleBookmark({
+                            id: path.id,
+                            title: path.title,
+                            path: `/careerpaths/${path.id}`,
+                            category: 'Career Paths',
+                            description: path.description,
+                            duration: path.duration
+                          });
+                        }
+                      }}
+                      className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                    >
+                      <Bookmark 
+                        className={`w-5 h-5 ${
+                          isBookmarked(path.id) 
+                            ? 'text-[#30d158] fill-[#30d158]' 
+                            : 'text-gray-400'
+                        }`} 
+                      />
+                    </button>
+                  </div>
+
                   {/* Background with gradient */}
                   <div className="absolute inset-0 rounded-3xl bg-[#1d1d1f] overflow-hidden">
                     <div 

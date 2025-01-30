@@ -26,6 +26,7 @@ import Activity from "./pages/Activity";
 import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
 import SearchResults from "./pages/SearchResults";
+import Bookmarks from "./pages/Bookmarks";
 
 export default function App() {
   return (
@@ -67,6 +68,7 @@ export default function App() {
                 <Route path="/notifications" element={<PrivateRoute><Notifications /></PrivateRoute>} />
                 <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
                 <Route path="/search" element={<SearchResults />} />
+                <Route path="/bookmarks" element={<PrivateRoute><Bookmarks /></PrivateRoute>} />
               </Routes>
             </div>
           </BrowserRouter>

@@ -15,8 +15,10 @@ import {
   Brain, 
   X,
   Code,
-  ArrowRight 
+  ArrowRight,
+  Bookmark
 } from 'lucide-react';
+import { useUserInteractions } from '../hooks/useUserInteractions';
 
 const roleIcons = {
   "Frontend Developer": Globe,
@@ -65,13 +67,14 @@ const roleDetails = {
  
 const CertificationCard = ({ cert }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
 
   if (!cert) return null;
 
   return (
     <motion.div
       layout
-      className="bg-[#1c1c1e] p-6 rounded-2xl border border-gray-700"
+      className="bg-[#1c1c1e] p-6 rounded-2xl border border-gray-700 relative group"
     >
       <div className="flex flex-col h-full">
         <h3 className="text-xl font-medium text-[#2997ff] mb-2">{cert.name}</h3>
@@ -168,6 +171,43 @@ const CertificationCard = ({ cert }) => {
             </a>
           )}
         </div>
+
+        {/* Add Bookmark Button */}
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent opening the modal
+            }}
+          >
+            <button
+              onClick={() => {
+                if (isBookmarked(cert.id)) {
+                  handleRemoveBookmark(cert.id);
+                } else {
+                  handleBookmark({
+                    id: cert.id,
+                    title: cert.title,
+                    path: cert.link,
+                    category: 'Certifications',
+                    description: cert.description,
+                    provider: cert.provider,
+                    duration: cert.duration,
+                    price: cert.price
+                  });
+                }
+              }}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <Bookmark 
+                className={`w-5 h-5 ${
+                  isBookmarked(cert.id) 
+                    ? 'text-[#2997ff] fill-[#2997ff]' 
+                    : 'text-gray-400'
+                }`} 
+              />
+            </button>
+          </button>
+        </div>
       </div>
     </motion.div>
   );
@@ -178,6 +218,7 @@ const Certifications = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
   
   const roles = Object.keys(roleDetails);
 
@@ -377,6 +418,41 @@ const Certifications = () => {
                 onClick={() => setSelectedRole(role)}
                 className="group relative aspect-[4/3] cursor-pointer"
               >
+                {/* Add Bookmark Button */}
+                <div 
+                  className="absolute top-4 right-4 z-10"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent opening the modal
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      if (isBookmarked(role)) {
+                        handleRemoveBookmark(role);
+                      } else {
+                        handleBookmark({
+                          id: role,
+                          title: role,
+                          path: `/certifications?role=${role}`,
+                          category: 'Certifications',
+                          description: details.description,
+                          totalCerts: details.totalCerts,
+                          avgCost: details.avgCost
+                        });
+                      }
+                    }}
+                    className="p-2 rounded-full hover:bg-white/10 transition-colors"
+                  >
+                    <Bookmark 
+                      className={`w-5 h-5 ${
+                        isBookmarked(role) 
+                          ? 'text-[#2997ff] fill-[#2997ff]' 
+                          : 'text-gray-400'
+                      }`} 
+                    />
+                  </button>
+                </div>
+
                 {/* Background with gradient */}
                 <div className="absolute inset-0 rounded-3xl bg-[#1d1d1f] overflow-hidden">
                   <div 
