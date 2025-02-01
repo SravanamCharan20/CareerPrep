@@ -167,6 +167,8 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isBookmarksOpen, setIsBookmarksOpen] = useState(false);
+  const location = useLocation();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -176,25 +178,44 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Add keyboard shortcut handler
+  // Update the useEffect for keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setIsSearchOpen(prev => !prev);
       }
-      if (e.key === 'Escape' && isSearchOpen) {
+      if (e.key === 'Escape') {
         setIsSearchOpen(false);
+        setIsMenuOpen(false);
+        setIsProfileOpen(false);
+        setIsBookmarksOpen(false);
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isSearchOpen]);
+  }, []);
 
-  const handleSignOut = () => {
-    dispatch(signOut());
-    navigate('/');
+  // Add useEffect to close mobile menu on route change
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
+
+  const handleSignOut = async () => {
+    try {
+      setIsSigningOut(true);
+      await dispatch(signOut());
+      // Close any open overlays
+      setIsProfileOpen(false);
+      setIsBookmarksOpen(false);
+      setIsMenuOpen(false);
+      navigate('/signin');  // Navigate to sign-in page after logout
+    } catch (error) {
+      console.error('Sign out failed:', error);
+    } finally {
+      setIsSigningOut(false);
+    }
   };
 
   return (
@@ -251,30 +272,46 @@ const Navbar = () => {
                 </button>
               </motion.div>
 
-              {/* Bookmarks Button */}
-              {currentUser && (
-                <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
-                  <button onClick={() => setIsBookmarksOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
-                    <Bookmark className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
-                    <span className="text-sm text-gray-400 group-hover:text-white">
-                      Bookmarks
-                    </span>
-                  </button>
-                </motion.div>
-              )}
+              {/* Show Sign In/Sign Up buttons when user is not logged in */}
+              {!currentUser ? (
+                <>
+                  <Link 
+                    to="/signin"
+                    className="px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                  >
+                    Sign in
+                  </Link>
+                  <Link 
+                    to="/signup"
+                    className="px-4 py-2 bg-[#2997ff] hover:bg-[#2997ff]/90 text-white rounded-full text-sm font-medium transition-colors"
+                  >
+                    Get Started
+                  </Link>
+                </>
+              ) : (
+                <>
+                  {/* Bookmarks Button */}
+                  <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
+                    <button onClick={() => setIsBookmarksOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
+                      <Bookmark className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
+                      <span className="text-sm text-gray-400 group-hover:text-white">
+                        Bookmarks
+                      </span>
+                    </button>
+                  </motion.div>
 
-              {/* Profile Button */}
-              {currentUser && (
-                <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
-                  <button onClick={() => setIsProfileOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
-                    <div className="w-8 h-8 rounded-full">
-                      {currentUser.username.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="text-sm text-gray-400 group-hover:text-white">
-                      {currentUser.username}
-                    </span>
-                  </button>
-                </motion.div>
+                  {/* Profile Button */}
+                  <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
+                    <button onClick={() => setIsProfileOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
+                      <div className="w-8 h-8 rounded-full bg-[#2997ff] flex items-center justify-center text-white">
+                        {currentUser.username.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-sm text-gray-400 group-hover:text-white">
+                        {currentUser.username}
+                      </span>
+                    </button>
+                  </motion.div>
+                </>
               )}
             </div>
 
@@ -331,9 +368,10 @@ const Navbar = () => {
                       </div>
                       <button
                         onClick={handleSignOut}
-                        className="mt-2 w-full px-4 py-2 bg-white/10 hover:bg-white/15 text-white rounded-full text-sm font-medium transition-colors"
+                        disabled={isSigningOut}
+                        className="mt-2 w-full px-4 py-2 bg-white/10 hover:bg-white/15 text-white rounded-full text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Sign out
+                        {isSigningOut ? 'Signing out...' : 'Sign out'}
                       </button>
                     </>
                   ) : (
