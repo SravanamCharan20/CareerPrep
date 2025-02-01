@@ -4,6 +4,7 @@ import { Mail, Lock } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
+import OAuth from "../components/OAuth";
 
 const Signin = () => {
   const [formData, setFormData] = useState({
@@ -127,15 +128,7 @@ const Signin = () => {
               <span className="bg-black px-2 text-gray-500">Or</span>
             </div>
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-3 border border-[#424245] rounded-lg text-white hover:border-[#2997ff] transition-colors flex items-center justify-center space-x-2"
-          >
-            <img src="../../public/images/google-logo.webp" alt="Google" className="w-5 h-5" />
-            <span>Continue with Google</span>
-          </motion.button>
+          <OAuth />
 
           <p className="text-center text-gray-400 mt-8">
             New to CareerPrep?{" "}

@@ -61,3 +61,34 @@ export const signin = async (req, res, next) => {
   }
 };
 
+export const googleAuth = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email })
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+      const {password, ...rest} = user._doc
+      const expiresIn = new Date(Date.now() + 1000 * 60 * 60 * 24)
+      res.cookie('access_token', token, { httpOnly: true, expires: expiresIn }).status(200).json(rest)
+    }
+    else {
+      const generatedPassword = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+      const hashedPassword = bcrypt.hashSync(generatedPassword.toString(), 10)
+      const newUser = new User({
+        username: req.body.name.split(' ').join('').toLowerCase(),
+        email: req.body.email,
+        password: hashedPassword,
+        profilePicture: req.body.photo,
+      })
+      await newUser.save()
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+      const {password, ...rest} = newUser._doc
+      const expiresIn = new Date(Date.now() + 1000 * 60 * 60 * 24)
+      res.cookie('access_token', token, { httpOnly: true, expires: expiresIn }).status(200).json(rest)
+    }
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+

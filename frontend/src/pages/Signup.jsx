@@ -4,6 +4,7 @@ import { User, Mail, Lock } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { signUpStart, signUpSuccess, signUpFailure } from '../redux/user/userSlice';
+import OAuth from "../components/OAuth";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -125,15 +126,8 @@ const Signup = () => {
               <span className="bg-black px-2 text-gray-500">Or</span>
             </div>
           </div>
-
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full py-3 border border-[#424245] rounded-lg text-white hover:border-[#2997ff] transition-colors flex items-center justify-center space-x-2"
-          >
-            <img src="../../public/images/google-logo.webp" alt="Google" className="w-5 h-5" />
-            <span>Continue with Google</span>
-          </motion.button>
+     
+          <OAuth />
 
           <div className="text-sm text-gray-400 text-center mt-6">
             By creating an account, you agree to our{" "}

@@ -402,12 +402,14 @@ const Navbar = () => {
       {/* Overlays */}
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <BookmarksOverlay isOpen={isBookmarksOpen} onClose={() => setIsBookmarksOpen(false)} />
-      <ProfileOverlay 
-        isOpen={isProfileOpen} 
-        onClose={() => setIsProfileOpen(false)}
-        currentUser={currentUser}
-        onSignOut={handleSignOut}
-      />
+      {currentUser && (
+        <ProfileOverlay 
+          isOpen={isProfileOpen} 
+          onClose={() => setIsProfileOpen(false)}
+          currentUser={currentUser}
+          onSignOut={handleSignOut}
+        />
+      )}
     </>
   );
 };
