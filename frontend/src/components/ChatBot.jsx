@@ -2,9 +2,101 @@ import { useState, useRef, useEffect } from 'react';
 import { FaRobot, FaTimes } from 'react-icons/fa';
 import { IoMdSend } from 'react-icons/io';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 
 const STORAGE_KEY = 'chatbot_history';
+
+// Message content component
+const MessageContent = ({ content }) => {
+  const parseMessageContent = (text) => {
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push({
+          type: 'text',
+          content: text.slice(lastIndex, match.index)
+        });
+      }
+
+      parts.push({
+        type: 'link',
+        text: match[1],
+        url: match[2]
+      });
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push({
+        type: 'text',
+        content: text.slice(lastIndex)
+      });
+    }
+
+    return parts;
+  };
+
+  const parts = parseMessageContent(content);
+  
+  return (
+    <div className="space-y-2">
+      {parts.map((part, index) => {
+        if (part.type === 'link') {
+          return (
+            <Link
+              key={index}
+              to={part.url}
+              // eslint-disable-next-line no-undef
+              onClick={() => setIsOpen(false)}
+              className="text-[#2997ff] hover:underline inline-block"
+            >
+              {part.text}
+            </Link>
+          );
+        }
+        return <span key={index}>{part.content}</span>;
+      })}
+    </div>
+  );
+};
+
+MessageContent.propTypes = {
+  content: PropTypes.string.isRequired
+};
+
+// Typing animation component
+const TypingAnimation = ({ text, onComplete }) => {
+  const [displayText, setDisplayText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (!text) return;
+
+    if (currentIndex < text.length) {
+      const timeoutId = setTimeout(() => {
+        setDisplayText(text.slice(0, currentIndex + 1));
+        setCurrentIndex(currentIndex + 1);
+      }, 15); // Adjust speed here (lower = faster)
+
+      return () => clearTimeout(timeoutId);
+    } else if (onComplete) {
+      onComplete();
+    }
+  }, [currentIndex, text, onComplete]);
+
+  return <MessageContent content={displayText} />;
+};
+
+TypingAnimation.propTypes = {
+  text: PropTypes.string.isRequired,
+  onComplete: PropTypes.func
+};
 
 const ChatBot = () => {
   // Initialize messages from localStorage or default message
@@ -22,6 +114,8 @@ const ChatBot = () => {
   const messagesEndRef = useRef(null);
   const modalRef = useRef(null);
   const inputRef = useRef(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentTypingMessage, setCurrentTypingMessage] = useState('');
 
   // Save messages to localStorage whenever they change
   useEffect(() => {
@@ -70,69 +164,6 @@ const ChatBot = () => {
     };
   }, [isOpen]);
 
-  const parseMessageContent = (content) => {
-    // Regular expression to match markdown-style links: [text](url)
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const parts = [];
-    let lastIndex = 0;
-    let match;
-
-    while ((match = linkRegex.exec(content)) !== null) {
-      // Add text before the link
-      if (match.index > lastIndex) {
-        parts.push({
-          type: 'text',
-          content: content.slice(lastIndex, match.index)
-        });
-      }
-
-      // Add the link
-      parts.push({
-        type: 'link',
-        text: match[1],
-        url: match[2]
-      });
-
-      lastIndex = match.index + match[0].length;
-    }
-
-    // Add remaining text after last link
-    if (lastIndex < content.length) {
-      parts.push({
-        type: 'text',
-        content: content.slice(lastIndex)
-      });
-    }
-
-    return parts;
-  };
-
-  // eslint-disable-next-line react/prop-types
-  const MessageContent = ({ content }) => {
-    const parts = parseMessageContent(content);
-    
-    return (
-      <div className="space-y-2">
-        {parts.map((part, index) => {
-          if (part.type === 'link') {
-            return (
-              <Link
-                key={index}
-                to={part.url}
-                onClick={() => setIsOpen(false)}
-                className="text-[#2997ff] hover:underline inline-block"
-              >
-                {part.text}
-              </Link>
-            );
-          }
-          return <span key={index}>{part.content}</span>;
-        })}
-      </div>
-    );
-  };
-
-
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
@@ -141,7 +172,6 @@ const ChatBot = () => {
       content: inputMessage
     };
 
-    // Update messages immediately for user's message
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedMessages));
@@ -155,15 +185,10 @@ const ChatBot = () => {
         includeLinks: true
       });
 
-      const assistantMessage = {
-        role: 'assistant',
-        content: response.data.reply
-      };
+      setIsLoading(false);
+      setIsTyping(true);
+      setCurrentTypingMessage(response.data.reply);
 
-      // Update messages with assistant's response
-      const finalMessages = [...updatedMessages, assistantMessage];
-      setMessages(finalMessages);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(finalMessages));
     } catch (error) {
       console.error('Error sending message:', error);
       const errorMessage = {
@@ -173,11 +198,20 @@ const ChatBot = () => {
       const finalMessages = [...updatedMessages, errorMessage];
       setMessages(finalMessages);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(finalMessages));
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
+  const handleTypingComplete = () => {
+    const assistantMessage = {
+      role: 'assistant',
+      content: currentTypingMessage
+    };
+    setMessages(prev => [...prev, assistantMessage]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...messages, assistantMessage]));
+    setIsTyping(false);
+    setCurrentTypingMessage('');
+  };
 
   return (
     <>
@@ -229,6 +263,19 @@ const ChatBot = () => {
                   </div>
                 </div>
               ))}
+
+              {/* Typing Animation */}
+              {isTyping && currentTypingMessage && (
+                <div className="flex justify-start animate-fadeIn">
+                  <div className="inline-block p-4 rounded-2xl max-w-[80%] bg-[#2c2c2e] text-gray-200">
+                    <TypingAnimation 
+                      text={currentTypingMessage}
+                      onComplete={handleTypingComplete}
+                    />
+                  </div>
+                </div>
+              )}
+
               {isLoading && (
                 <div className="text-center text-gray-400">
                   <div className="animate-pulse flex items-center justify-center gap-2">
@@ -245,18 +292,19 @@ const ChatBot = () => {
             <div className="p-6 bg-[#1c1c1e]">
               <div className="flex gap-4">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Ask about any feature, roadmap, or learning path..."
                   className="flex-1 bg-[#2c2c2e] text-white border-none rounded-xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-[#2997ff] placeholder-gray-500 text-lg"
+                  disabled={isTyping}
                   autoFocus
-                  ref={inputRef}
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={isLoading}
+                  disabled={isLoading || isTyping || !inputMessage.trim()}
                   className="bg-[#2997ff] text-white px-6 rounded-xl hover:bg-[#2997ff]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
                 >
                   <span className="hidden sm:inline">Send</span>
