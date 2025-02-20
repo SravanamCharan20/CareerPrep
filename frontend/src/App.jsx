@@ -27,6 +27,7 @@ import Notifications from "./pages/Notifications";
 import Settings from "./pages/Settings";
 import SearchResults from "./pages/SearchResults";
 import Bookmarks from "./pages/Bookmarks";
+import ChatBot from './components/ChatBot';
 
 export default function App() {
   return (
@@ -71,6 +72,7 @@ export default function App() {
                 <Route path="/bookmarks" element={<PrivateRoute><Bookmarks /></PrivateRoute>} />
               </Routes>
             </div>
+            <ChatBot />
           </BrowserRouter>
         </RoadmapProvider>
       </PersistGate>
