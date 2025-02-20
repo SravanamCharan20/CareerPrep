@@ -42,8 +42,8 @@ function MLProjects() {
   // Filter projects based on search and trending
   const filteredProjects = projects
     .filter(project => 
-      project.repo_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      (project?.repo_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (project?.description?.toLowerCase() || '').includes(searchTerm.toLowerCase())
     )
     .filter(project => {
       if (filter === 'trending') return project.stars >= 1000; // Consider projects with 1000+ stars as trending
