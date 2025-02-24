@@ -116,12 +116,12 @@ export const ProfileOverlay = ({ isOpen, onClose, currentUser, onSignOut }) => {
                         <div className="flex items-center gap-4 p-4 mb-6 bg-white/5 rounded-xl">
                             <div className="w-16 h-16 rounded-full bg-gradient-to-r from-[#2997ff] to-[#30d158] flex items-center justify-center">
                                 <span className="text-2xl font-medium text-white">
-                                    {currentUser.username.charAt(0).toUpperCase()}
+                                    {currentUser?.username?.charAt(0)?.toUpperCase() || '?'}
                                 </span>
                             </div>
                             <div>
-                                <h3 className="text-lg font-medium text-white">{currentUser.username}</h3>
-                                <p className="text-sm text-gray-400">{currentUser.email}</p>
+                                <h3 className="text-lg font-medium text-white">{currentUser?.username || 'User'}</h3>
+                                <p className="text-sm text-gray-400">{currentUser?.email || 'No email provided'}</p>
                             </div>
                         </div>
 
@@ -219,8 +219,16 @@ ProfileOverlay.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     currentUser: PropTypes.shape({
-        username: PropTypes.string.isRequired,
-        email: PropTypes.string.isRequired,
-    }).isRequired,
+        username: PropTypes.string,
+        email: PropTypes.string,
+    }),
     onSignOut: PropTypes.func.isRequired
+};
+
+// Add default props
+ProfileOverlay.defaultProps = {
+    currentUser: {
+        username: 'User',
+        email: 'No email provided'
+    }
 }; 

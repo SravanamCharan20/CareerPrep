@@ -304,10 +304,10 @@ const Navbar = () => {
                   <motion.div className="relative group" whileHover={{ scale: 1.05 }}>
                     <button onClick={() => setIsProfileOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-sm transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10">
                       <div className="w-8 h-8 rounded-full bg-[#2997ff] flex items-center justify-center text-white">
-                        {currentUser.username.charAt(0).toUpperCase()}
+                        {currentUser?.username?.charAt(0)?.toUpperCase() || '?'}
                       </div>
                       <span className="text-sm text-gray-400 group-hover:text-white">
-                        {currentUser.username}
+                        {currentUser?.username || 'User'}
                       </span>
                     </button>
                   </motion.div>
@@ -402,11 +402,11 @@ const Navbar = () => {
       {/* Overlays */}
       <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
       <BookmarksOverlay isOpen={isBookmarksOpen} onClose={() => setIsBookmarksOpen(false)} />
-      {currentUser && (
+      {isProfileOpen && (
         <ProfileOverlay 
           isOpen={isProfileOpen} 
           onClose={() => setIsProfileOpen(false)}
-          currentUser={currentUser}
+          currentUser={currentUser || {}}
           onSignOut={handleSignOut}
         />
       )}
