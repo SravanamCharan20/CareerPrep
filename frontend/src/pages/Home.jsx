@@ -89,7 +89,7 @@ const LearningPathCard = ({ title, description, skills, duration, level, color }
 
 const Home = () => {
   const { currentUser } = useSelector(state => state.user);
-  const { lastVisited, completedCourses, totalCourses = 10 } = useUserProgress();
+  const { lastVisited} = useUserProgress();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -118,14 +118,14 @@ const Home = () => {
           >
             <h1 className="text-7xl font-bold mb-8">
               Build Your Future in
-              <span className="block text-[#2997ff] mt-2">Technology</span>
+              <span className="block text-5xl sm:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#2997ff] via-[#30d158] to-[#ff375f] animate-gradient-x">Technology</span>
             </h1>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-12 leading-relaxed">
               Master in-demand skills, build real projects, and accelerate your tech career with structured learning paths and expert guidance.
             </p>
             <div className="flex gap-6 justify-center">
               <Link to="/signup">
-                <button className="px-8 py-4 bg-[#2997ff] rounded-2xl font-medium hover:bg-[#2997ff]/90 transition-colors flex items-center gap-2 group">
+                <button className="px-8 py-4 bg-[#2997ff] cursor-pointer rounded-2xl font-medium hover:bg-[#2997ff]/90 transition-colors flex items-center gap-2 group">
                   Start Learning
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -148,7 +148,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-32 px-6 bg-gradient-to-b from-black to-[#1d1d1f]">
+      <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <motion.h2 
@@ -187,7 +187,7 @@ const Home = () => {
       </section>
 
       {/* Learning Paths Section */}
-      <section className="py-32 px-6">
+      <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-4xl font-bold mb-6">Learning Paths</h2>
@@ -224,51 +224,7 @@ const Home = () => {
             />
           </div>
         </div>
-      </section>
-
-      {/* Welcome Back Section for logged-in users */}
-      {currentUser && lastVisited && (
-        <section className="py-16 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-[#1d1d1f]/50 backdrop-blur-xl rounded-3xl p-12 relative overflow-hidden border border-white/10">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-[#2997ff]/20 rounded-full blur-[100px] opacity-30" />
-              <div className="relative">
-                <h2 className="text-3xl font-bold mb-8">
-                  Welcome back, {currentUser.username}!
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div>
-                    <p className="text-xl text-gray-400 mb-6">Continue your journey:</p>
-                    <Link 
-                      to={lastVisited.path}
-                      className="inline-flex items-center gap-2 text-[#2997ff] hover:text-[#2997ff]/80 transition-colors group text-lg"
-                    >
-                      Resume Learning
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </div>
-                  <div>
-                    <p className="text-xl text-gray-400 mb-4">Your Progress:</p>
-                    <div className="flex items-center gap-8">
-                      <div>
-                        <p className="text-3xl font-bold mb-2">{completedCourses.length}</p>
-                        <p className="text-gray-400">Courses Completed</p>
-                      </div>
-                      <div className="h-12 w-px bg-white/10" />
-                      <div>
-                        <p className="text-3xl font-bold mb-2">
-                          {Math.round((completedCourses.length / totalCourses) * 100)}%
-                        </p>
-                        <p className="text-gray-400">Overall Progress</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      </section>    
     </div>
   );
 };

@@ -237,7 +237,7 @@ const Navbar = () => {
               to="/" 
               className="text-2xl font-bold text-white flex items-center gap-2"
             >
-              <span className="text-2xl  font-bold">CareerPrep</span>
+              <span className="text-xl mb-1 bg-clip-text text-transparent bg-gradient-to-r from-[#2997ff] via-[#30d158] to-[#ff375f] font-bold">CareerPrep</span>
             </Link>
 
             {/* Desktop Navigation */}

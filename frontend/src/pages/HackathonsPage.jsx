@@ -173,7 +173,7 @@ const HackathonsPage = () => {
       <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] via-black to-black" />
+          <div className="absolute inset-0" />
           <div className="absolute inset-0">
             {/* Animated Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f1a_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f1a_1px,transparent_1px)] bg-[size:24px_24px]" />
