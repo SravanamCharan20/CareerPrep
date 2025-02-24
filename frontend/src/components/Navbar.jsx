@@ -235,16 +235,9 @@ const Navbar = () => {
             {/* Logo */}
             <Link 
               to="/" 
-              className="text-xl font-bold text-white flex items-center gap-2"
+              className="text-2xl font-bold text-white flex items-center gap-2"
             >
-              <motion.div
-                whileHover={{ rotate: 180 }}
-                transition={{ duration: 0.3 }}
-                className="w-8 h-8 bg-gradient-to-r from-[#2997ff] to-[#30d158] rounded-lg flex items-center justify-center"
-              >
-                <span className="text-white">C</span>
-              </motion.div>
-              <span>CareerPrep</span>
+              <span className="text-2xl  font-bold">CareerPrep</span>
             </Link>
 
             {/* Desktop Navigation */}

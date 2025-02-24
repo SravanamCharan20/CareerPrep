@@ -5,6 +5,9 @@ import { useState } from 'react';
 import { useUserInteractions } from '../hooks/useUserInteractions';
 import { useSelector } from 'react-redux';
 import { useRoadmapProgress } from '../hooks/useRoadmapProgress';
+import {  
+  Code
+} from 'lucide-react';
 
 const roadmaps = [
   {
@@ -118,59 +121,93 @@ export default function Roadmaps() {
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
       <section className="relative min-h-[50vh] flex items-center justify-center overflow-hidden">
+        {/* Animated Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a] via-black to-black" />
           <div className="absolute inset-0">
+            {/* Animated Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f1a_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f1a_1px,transparent_1px)] bg-[size:24px_24px]" />
+            
+            {/* Glowing Orbs */}
+            <div className="absolute top-20 left-20 w-72 h-72 bg-[#2997ff]/20 rounded-full blur-[120px] animate-pulse" />
+            <div className="absolute bottom-10 right-20 w-96 h-96 bg-[#30d158]/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+            <div className="absolute top-40 right-40 w-64 h-64 bg-[#ff375f]/20 rounded-full blur-[120px] animate-pulse delay-700" />
           </div>
         </div>
 
+        {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-24">
           <div className="text-center">
-            <motion.h1
+            {/* Floating Icons */}
+            <div className="relative mb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="absolute -top-16 left-1/2 -translate-x-32 w-16 h-16 bg-[#1c1c1e] rounded-2xl border border-[#2c2c2e] p-4"
+              >
+                <Code className="w-full h-full text-[#2997ff]" />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="absolute -top-20 left-1/2 translate-x-16 w-14 h-14 bg-[#1c1c1e] rounded-2xl border border-[#2c2c2e] p-3"
+              >
+                <Brain className="w-full h-full text-[#30d158]" />
+              </motion.div>
+            </div>
+
+            {/* Title with Gradient Animation */}
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-5xl sm:text-7xl font-bold mb-6"
+              className="mb-6"
             >
-              Learning Roadmaps
-            </motion.h1>
+              <h1 className="text-5xl sm:text-7xl font-bold inline-block bg-clip-text text-transparent bg-gradient-to-r from-[#2997ff] via-[#30d158] to-[#ff375f] animate-gradient-x">
+                Explore Roadmaps
+              </h1>
+            </motion.div>
+
+            {/* Description with Typing Effect */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               className="text-xl text-gray-400 max-w-3xl mx-auto mb-12"
             >
-              Follow structured learning paths to master different technologies
+              Explore cutting-edge technologies and chart your path in the tech industry.
             </motion.p>
 
-            {/* Search and Filter Section */}
+            {/* Search and Filter Section with Glass Effect */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto"
+              className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto backdrop-blur-lg bg-white/5 p-4 rounded-2xl border border-white/10"
             >
-              <div className="relative w-full">
+              <div className="relative w-full sm:w-96">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search roadmaps..."
+                  placeholder="Search careers, skills, tools..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-[#1c1c1e] border border-[#333333] rounded-xl focus:outline-none focus:border-[#2997ff] text-white placeholder-gray-500"
+                  className="w-full pl-10 pr-4 py-3 bg-black/40 border border-white/10 rounded-xl focus:outline-none focus:border-[#2997ff] text-white placeholder-gray-500 transition-all"
                 />
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="p-3 rounded-xl bg-[#1c1c1e] border border-[#333333] hover:bg-[#2c2c2e]"
+                className="flex items-center gap-2 px-6 py-3 bg-[#2997ff] hover:bg-[#2997ff]/90 rounded-xl transition-colors"
               >
-                <SlidersHorizontal className="w-5 h-5 text-gray-400" />
+                <SlidersHorizontal className="w-5 h-5" />
+                <span>Filters</span>
               </button>
             </motion.div>
 
-            {/* Filter Buttons */}
+            {/* Filter Tags with Animation */}
             <AnimatePresence>
-              {showFilters && (
+              {showFilters && filters && (
                 <motion.div
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -180,11 +217,14 @@ export default function Roadmaps() {
                   {Object.entries(filters).map(([key, filter]) => (
                     <motion.button
                       key={key}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1 }}
                       onClick={() => setSelectedFilter(key)}
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                         selectedFilter === key
                           ? 'bg-[#2997ff] text-white scale-105'
-                          : 'bg-[#1c1c1e] text-gray-400 hover:bg-[#2c2c2e]'
+                          : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:scale-105'
                       }`}
                     >
                       {filter.label}

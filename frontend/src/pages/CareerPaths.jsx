@@ -12,9 +12,9 @@ import React from 'react';
 import * as careerPaths from '../data/careerpaths';
 import { useUserInteractions } from '../hooks/useUserInteractions';
 import { useActivityTracking } from '../hooks/useActivityTracking';
+import { Link } from 'react-router-dom';
 
 const CareerPaths = () => {
-  const [selectedPath, setSelectedPath] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [filteredPaths, setFilteredPaths] = useState([]);
@@ -24,7 +24,13 @@ const CareerPaths = () => {
   const [bookmarkLoading, setBookmarkLoading] = useState({});
 
   // Memoize allPaths to prevent unnecessary recalculations
-  const allPaths = useMemo(() => Object.values(careerPaths), []);
+  const allPaths = useMemo(() => {
+    const paths = Object.values(careerPaths);
+    return paths.map(path => ({
+      ...path,
+      id: path.title.toLowerCase().replace(/\s+/g, '')
+    }));
+  }, []);
 
   // Define filters object
   const filters = {
@@ -103,10 +109,6 @@ const CareerPaths = () => {
   }, [allPaths]);
 
   // Add activity tracking when a career path is selected
-  const handlePathSelect = (path) => {
-    setSelectedPath(path);
-    trackCareerPathExplored(path);
-  };
 
   // Create a wrapped bookmark handler with better error handling
   const handleBookmarkClick = async (e, path) => {
@@ -127,14 +129,13 @@ const CareerPaths = () => {
           category: 'Career Paths',
           description: path.description,
           duration: path.duration,
-          timestamp: new Date().toISOString() // Add timestamp for lastVisited
+          timestamp: new Date().toISOString()
         };
         
         await handleBookmark(bookmarkData);
       }
     } catch (error) {
       console.error('Bookmark operation failed:', error);
-      // Could add toast notification here if you have a notification system
     } finally {
       setBookmarkLoading(prev => ({ ...prev, [path.id]: false }));
     }
@@ -271,281 +272,114 @@ const CareerPaths = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredPaths.map((path, index) => (
-                <motion.div
+                <Link 
+                  to={`/careerpaths/${path.id}`} 
                   key={path.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="relative group"
-                  onClick={() => handlePathSelect(path)}
+                  onClick={() => trackCareerPathExplored(path)}
                 >
-                  {/* Bookmark Button */}
-                  <div 
-                    className="absolute top-4 right-4 z-10"
-                    onClick={(e) => e.stopPropagation()}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="relative group"
                   >
-                    <button
-                      onClick={(e) => handleBookmarkClick(e, path)}
-                      disabled={bookmarkLoading[path.id]}
-                      aria-label={isBookmarked(path.id) ? "Remove from bookmarks" : "Add to bookmarks"}
-                      className={`p-2 rounded-full transition-all ${
-                        bookmarkLoading[path.id] 
-                          ? 'opacity-50 cursor-not-allowed' 
-                          : 'hover:bg-white/10'
-                      }`}
-                    >
-                      <Bookmark 
-                        className={`w-5 h-5 transition-colors ${
-                          isBookmarked(path.id) 
-                            ? 'text-[#30d158] fill-[#30d158]' 
-                            : 'text-gray-400'
-                        }`} 
-                      />
-                    </button>
-                  </div>
-
-                  {/* Background with gradient */}
-                  <div className="absolute inset-0 rounded-3xl bg-[#1d1d1f] overflow-hidden">
+                    {/* Bookmark Button */}
                     <div 
-                      className="absolute inset-0 bg-gradient-to-br from-[#2997ff]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                    />
-                  </div>
-
-                  {/* Content */}
-                  <div className="relative h-full p-8 flex flex-col">
-                    {/* Icon */}
-                    <div 
-                      className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-500"
-                      style={{ backgroundColor: '#2997ff15' }}
+                      className="absolute top-4 right-4 z-10"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {React.createElement(path.icon, { 
-                        size: 28,
-                        className: "text-[#2997ff]"
-                      })}
-                    </div>
-
-                    {/* Text Content */}
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-semibold mb-3 text-white group-hover:text-[#2997ff] transition-colors">
-                        {path.title}
-                      </h3>
-                      <p className="text-gray-400 text-base line-clamp-2">
-                        {path.description}
-                      </p>
-                    </div>
-
-                    {/* Skills Preview */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {path.skills.slice(0, 2).map((skill) => (
-                        <span 
-                          key={skill}
-                          className="px-2 py-1 rounded-full bg-[#2997ff]/10 text-[#2997ff] text-xs"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                      {path.skills.length > 2 && (
-                        <span className="px-2 py-1 text-gray-400 text-xs">
-                          +{path.skills.length - 2} more
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Footer Info */}
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-green-500">{path.salary.entry}</span>
-                        <span className="text-gray-600">•</span>
-                        <span className="text-sm text-gray-400">{path.demand}</span>
-                      </div>
-                      <div 
-                        className="flex items-center gap-2 text-sm font-medium text-[#2997ff]"
+                      <button
+                        onClick={(e) => handleBookmarkClick(e, path)}
+                        disabled={bookmarkLoading[path.id]}
+                        aria-label={isBookmarked(path.id) ? "Remove from bookmarks" : "Add to bookmarks"}
+                        className={`p-2 rounded-full transition-all ${
+                          bookmarkLoading[path.id] 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'hover:bg-white/10'
+                        }`}
                       >
-                        <span>View Path</span>
-                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </div>
+                        <Bookmark 
+                          className={`w-5 h-5 transition-colors ${
+                            isBookmarked(path.id) 
+                              ? 'text-[#30d158] fill-[#30d158]' 
+                              : 'text-gray-400'
+                          }`} 
+                        />
+                      </button>
                     </div>
 
-                    {/* Border */}
-                    <div className="absolute inset-0 rounded-3xl border border-[#333333] group-hover:border-[#444444] transition-colors" />
-                  </div>
-                </motion.div>
+                    {/* Background with gradient */}
+                    <div className="absolute inset-0 rounded-3xl bg-[#1d1d1f] overflow-hidden">
+                      <div 
+                        className="absolute inset-0 bg-gradient-to-br from-[#2997ff]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div className="relative h-full p-8 flex flex-col">
+                      {/* Icon */}
+                      <div 
+                        className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 duration-500"
+                        style={{ backgroundColor: '#2997ff15' }}
+                      >
+                        {React.createElement(path.icon, { 
+                          size: 28,
+                          className: "text-[#2997ff]"
+                        })}
+                      </div>
+
+                      {/* Text Content */}
+                      <div className="flex-1">
+                        <h3 className="text-2xl font-semibold mb-3 text-white group-hover:text-[#2997ff] transition-colors">
+                          {path.title}
+                        </h3>
+                        <p className="text-gray-400 text-base line-clamp-2">
+                          {path.description}
+                        </p>
+                      </div>
+
+                      {/* Skills Preview */}
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {path.skills.slice(0, 2).map((skill) => (
+                          <span 
+                            key={skill}
+                            className="px-2 py-1 rounded-full bg-[#2997ff]/10 text-[#2997ff] text-xs"
+                          >
+                            {skill}
+                          </span>
+                        ))}
+                        {path.skills.length > 2 && (
+                          <span className="px-2 py-1 text-gray-400 text-xs">
+                            +{path.skills.length - 2} more
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Footer Info */}
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-green-500">{path.salary.entry}</span>
+                          <span className="text-gray-600">•</span>
+                          <span className="text-sm text-gray-400">{path.demand}</span>
+                        </div>
+                        <div 
+                          className="flex items-center gap-2 text-sm font-medium text-[#2997ff]"
+                        >
+                          <span>View Path</span>
+                          <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                        </div>
+                      </div>
+
+                      {/* Border */}
+                      <div className="absolute inset-0 rounded-3xl border border-[#333333] group-hover:border-[#444444] transition-colors" />
+                    </div>
+                  </motion.div>
+                </Link>
               ))}
             </div>
           )}
         </div>
       </section>
-
-      {/* Selected Path Modal */}
-      <AnimatePresence>
-        {selectedPath && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80 backdrop-blur-xl z-50 overflow-y-auto"
-          >
-            <div className="min-h-screen px-6 py-20">
-              <div className="max-w-4xl mx-auto">
-                <button 
-                  onClick={() => setSelectedPath(null)}
-                  className="mb-8 text-gray-400 hover:text-white transition-colors"
-                >
-                  ← Back to paths
-                </button>
-
-                <div className="space-y-12">
-                  {/* Header */}
-                  <div className="flex items-start gap-6">
-                    <div className="w-16 h-16 rounded-2xl bg-[#2997ff]/10 flex items-center justify-center">
-                      {React.createElement(selectedPath.icon, { 
-                        size: 32,
-                        className: "text-[#2997ff]"
-                      })}
-                    </div>
-                    <div>
-                      <h2 className="text-3xl font-bold mb-2">{selectedPath.title}</h2>
-                      <p className="text-xl text-gray-400">{selectedPath.description}</p>
-                    </div>
-                  </div>
-
-                  {/* Job Roles */}
-                  <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                    <h3 className="text-lg font-semibold mb-4">Job Roles You Can Expect</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {(selectedPath.jobRoles || []).map((role) => (
-                        <div 
-                          key={role}
-                          className="p-3 rounded-xl bg-[#2c2c2e] text-gray-300"
-                        >
-                          {role}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Key Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                      <h3 className="text-lg font-semibold mb-2">Time to Learn</h3>
-                      <p className="text-2xl text-[#2997ff]">{selectedPath.timeTaken}</p>
-                    </div>
-                    <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                      <h3 className="text-lg font-semibold mb-2">Starting Salary</h3>
-                      <p className="text-2xl text-green-500">{selectedPath.salary?.entry || 'N/A'}</p>
-                    </div>
-                    <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                      <h3 className="text-lg font-semibold mb-2">Competition</h3>
-                      <p className="text-2xl text-orange-500">{selectedPath.competition}</p>
-                    </div>
-                  </div>
-
-                  {/* Add a new section for detailed salary information */}
-                  <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                    <h3 className="text-lg font-semibold mb-6">Salary Progression</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                      <div className="p-4 rounded-xl bg-[#2c2c2e]">
-                        <div className="text-sm text-gray-400 mb-1">Entry Level</div>
-                        <div className="text-xl text-green-500">{selectedPath.salary?.entry || 'N/A'}</div>
-                      </div>
-                      <div className="p-4 rounded-xl bg-[#2c2c2e]">
-                        <div className="text-sm text-gray-400 mb-1">Mid Level</div>
-                        <div className="text-xl text-green-500">{selectedPath.salary?.mid || 'N/A'}</div>
-                      </div>
-                      <div className="p-4 rounded-xl bg-[#2c2c2e]">
-                        <div className="text-sm text-gray-400 mb-1">Senior Level</div>
-                        <div className="text-xl text-green-500">{selectedPath.salary?.senior || 'N/A'}</div>
-                      </div>
-                    </div>
-
-                    {/* Only render regional variations if they exist */}
-                    {selectedPath.salary?.regions && Object.keys(selectedPath.salary.regions).length > 0 && (
-                      <>
-                        <h4 className="text-sm font-medium text-gray-400 mb-4">Regional Variations</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {Object.entries(selectedPath.salary.regions).map(([region, level]) => (
-                            <div key={region} className="p-3 rounded-xl bg-[#2c2c2e]">
-                              <div className="text-sm text-gray-400">{region}</div>
-                              <div className="text-sm text-[#2997ff]">{level}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Skills & Tools */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                      <h3 className="text-lg font-semibold mb-4">Required Skills</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {(selectedPath.skills || []).map((skill) => (
-                          <span 
-                            key={skill}
-                            className="px-3 py-1 rounded-full bg-[#2997ff]/10 text-[#2997ff] text-sm"
-                          >
-                            {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                      <h3 className="text-lg font-semibold mb-4">Tools Used</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {(selectedPath.tools || []).map((tool) => (
-                          <span 
-                            key={tool}
-                            className="px-3 py-1 rounded-full bg-purple-500/10 text-purple-500 text-sm"
-                          >
-                            {tool}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Learning Roadmap */}
-                  <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                    <h3 className="text-lg font-semibold mb-6">Learning Roadmap</h3>
-                    <div className="space-y-6">
-                      {(selectedPath.roadmap || []).map((stage, index) => (
-                        <div key={stage.title} className="relative pl-8">
-                          <div className="absolute left-0 top-0 w-4 h-4 rounded-full bg-[#2997ff]/20 border-2 border-[#2997ff]" />
-                          {index !== (selectedPath.roadmap || []).length - 1 && (
-                            <div className="absolute left-2 top-4 w-0.5 h-full bg-[#2997ff]/20" />
-                          )}
-                          <h4 className="text-lg font-medium mb-2">{stage.title}</h4>
-                          <ul className="space-y-2">
-                            {(stage.items || []).map((item) => (
-                              <li key={item} className="text-gray-400">• {item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Communities */}
-                  <div className="p-6 rounded-2xl bg-[#1c1c1e] border border-[#2c2c2e]">
-                    <h3 className="text-lg font-semibold mb-4">Communities to Learn From</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {(selectedPath.communities || []).map((community) => (
-                        <span 
-                          key={community}
-                          className="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-sm"
-                        >
-                          {community}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

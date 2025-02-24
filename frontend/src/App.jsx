@@ -28,6 +28,9 @@ import Settings from "./pages/Settings";
 import SearchResults from "./pages/SearchResults";
 import Bookmarks from "./pages/Bookmarks";
 import ChatBot from './components/ChatBot';
+import FrontendPath from './pages/paths/FrontendPath';
+import BackendPath from './pages/paths/BackendPath';
+import FullStackPath from './pages/paths/FullStackPath';
 
 export default function App() {
   return (
@@ -47,6 +50,9 @@ export default function App() {
                 <Route path="/mernprojects" element={<MernProjects />} />
                 <Route path="/roadmaps" element={<Roadmaps />} />
                 <Route path="/careerpaths" element={<CareerPaths />} />
+                <Route path="/careerpaths/frontenddeveloper" element={<FrontendPath />} />
+                <Route path="/careerpaths/backenddeveloper" element={<BackendPath />} />
+                <Route path="/careerpaths/fullstackdeveloper" element={<FullStackPath />} />
                 <Route 
                   path="/roadmaps/*" 
                   element={

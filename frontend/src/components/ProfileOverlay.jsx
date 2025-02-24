@@ -5,8 +5,6 @@ import {
     User, 
     LogOut, 
     ChevronRight, 
-    Moon, 
-    Sun,
     Activity,
     Bookmark,
     Search,
@@ -18,7 +16,6 @@ import PropTypes from 'prop-types';
 export const ProfileOverlay = ({ isOpen, onClose, currentUser, onSignOut }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const { userInteractions } = useSelector(state => state.user);
-    const [isDarkMode, setIsDarkMode] = useState(true);
     const inputRef = useRef(null);
 
     // Add ESC key handler
@@ -72,16 +69,6 @@ export const ProfileOverlay = ({ isOpen, onClose, currentUser, onSignOut }) => {
         },
         {
             type: 'button',
-            icon: isDarkMode ? Sun : Moon,
-            label: `${isDarkMode ? 'Light' : 'Dark'} Mode`,
-            onClick: () => setIsDarkMode(!isDarkMode),
-            info: `Switch to ${isDarkMode ? 'light' : 'dark'} mode`
-        },
-        {
-            type: 'divider'
-        },
-        {
-            type: 'button',
             icon: LogOut,
             label: 'Sign Out',
             onClick: onSignOut,
@@ -110,7 +97,7 @@ export const ProfileOverlay = ({ isOpen, onClose, currentUser, onSignOut }) => {
                         initial={{ opacity: 0, y: -50 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -50 }}
-                        className="fixed inset-x-4 top-10 md:top-24 md:left-1/2 md:-translate-x-1/2  bg-[#1c1c1e]/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 z-50 w-full max-w-4xl shadow-2xl mx-auto"
+                        className="fixed inset-x-4 top-10 md:top-24 md:left-1/2 md:-translate-x-1/2  bg-[#1c1c1e]/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 z-50 w-1/2 cursor-pointer max-w-4xl shadow-2xl mx-auto"
                     >
                         {/* User Info */}
                         <div className="flex items-center gap-4 p-4 mb-6 bg-white/5 rounded-xl">

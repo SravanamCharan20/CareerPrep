@@ -19,7 +19,6 @@ import {
   Bookmark
 } from 'lucide-react';
 import { useUserInteractions } from '../hooks/useUserInteractions';
-import { useActivityTracking } from '../hooks/useActivityTracking';
 
 const roleIcons = {
   "Frontend Developer": Globe,
@@ -220,7 +219,6 @@ const Certifications = () => {
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
   const { handleBookmark, handleRemoveBookmark, isBookmarked } = useUserInteractions();
-  const { trackCertificationComplete } = useActivityTracking();
   
   const roles = Object.keys(roleDetails);
 
@@ -282,9 +280,6 @@ const Certifications = () => {
     }
   };
 
-  const handleCertificationComplete = (cert) => {
-    trackCertificationComplete(cert);
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">

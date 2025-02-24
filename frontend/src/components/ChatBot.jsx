@@ -215,48 +215,59 @@ const ChatBot = () => {
 
   return (
     <>
+      {/* Updated floating button with pulse effect and larger size */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 z-40 bg-[#2997ff] text-white p-4 rounded-full shadow-lg hover:bg-[#2997ff]/90 transition-all"
+        className="fixed bottom-6 right-6 z-40 bg-white  text-black p-5  cursor-pointer rounded-2xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 group"
       >
-        <FaRobot size={24} />
+        <div className="absolute -inset-1 bg-gradient-to-r  from-[#2997ff] to-[#2171b5] rounded-2xl opacity-30 group-hover:opacity-50 blur-lg transition-all duration-300"></div>
+        <div className="relative flex items-center gap-3">
+          <FaRobot size={28} className="animate-pulse" />
+          <span className="hidden md:block font-semibold">AI Assistant</span>
+        </div>
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-[10vh]">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div 
             ref={modalRef}
-            className="bg-[#1c1c1e] rounded-2xl shadow-2xl w-full max-w-3xl flex flex-col border border-[#2997ff]/20 relative mx-4"
+            className="bg-gradient-to-b from-[#1c1c1e] to-[#2c2c2e] rounded-3xl shadow-2xl w-full max-w-4xl flex flex-col border border-[#2997ff]/30 relative mx-4 transform transition-all duration-300 scale-100 opacity-100"
           >
-            {/* Header */}
-            <div className="p-6 flex justify-between items-center border-b border-[#2997ff]/20">
-              <div className="flex items-center gap-3">
-                <FaRobot className="text-[#2997ff]" size={24} />
-                <h3 className="text-xl font-semibold text-white">AI Learning Assistant</h3>
+            {/* Enhanced Header */}
+            <div className="p-6 flex justify-between items-center border-b border-[#2997ff]/30 bg-[#1c1c1e]/80 rounded-t-3xl backdrop-blur-md">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-[#2997ff] to-[#2171b5] rounded-full opacity-30 blur-sm"></div>
+                  <FaRobot className="text-[#2997ff] relative" size={28} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white">AI Learning Assistant</h3>
+                  <p className="text-gray-400 text-sm">Powered by Advanced AI</p>
+                </div>
               </div>
               <div className="flex items-center gap-4 text-gray-400">
-                <kbd className="hidden sm:inline-block px-2 py-1 text-xs font-semibold bg-[#2c2c2e] rounded">esc</kbd>
+                <kbd className="hidden sm:inline-block px-3 py-1.5 text-xs font-semibold bg-[#2c2c2e] rounded-lg border border-[#3c3c3e]">esc</kbd>
                 <button 
                   onClick={() => setIsOpen(false)}
-                  className="hover:text-white p-2 rounded-lg transition-all"
+                  className="hover:text-white p-2 rounded-lg transition-all hover:bg-[#2c2c2e]"
                 >
                   <FaTimes size={20} />
                 </button>
               </div>
             </div>
             
-            {/* Updated Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 max-h-[60vh] scrollbar-thin scrollbar-thumb-[#2c2c2e] scrollbar-track-transparent">
+            {/* Enhanced Messages Area */}
+            <div className="flex-1 overflow-y-auto p-8 space-y-8 max-h-[60vh] scrollbar-thin scrollbar-thumb-[#2997ff]/20 scrollbar-track-transparent">
               {messages.map((message, index) => (
                 <div
                   key={index}
                   className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
                 >
                   <div
-                    className={`inline-block p-4 rounded-2xl max-w-[80%] ${
+                    className={`inline-block p-5 rounded-2xl max-w-[85%] shadow-lg ${
                       message.role === 'user'
-                        ? 'bg-[#2997ff] text-white'
-                        : 'bg-[#2c2c2e] text-gray-200'
+                        ? 'bg-gradient-to-br from-[#2997ff] to-[#2171b5] text-white'
+                        : 'bg-gradient-to-br from-[#2c2c2e] to-[#3c3c3e] text-gray-200'
                     }`}
                   >
                     <MessageContent content={message.content} />
@@ -264,10 +275,10 @@ const ChatBot = () => {
                 </div>
               ))}
 
-              {/* Typing Animation */}
+              {/* Enhanced Typing Animation */}
               {isTyping && currentTypingMessage && (
                 <div className="flex justify-start animate-fadeIn">
-                  <div className="inline-block p-4 rounded-2xl max-w-[80%] bg-[#2c2c2e] text-gray-200">
+                  <div className="inline-block p-5 rounded-2xl max-w-[85%] bg-gradient-to-br from-[#2c2c2e] to-[#3c3c3e] text-gray-200 shadow-lg">
                     <TypingAnimation 
                       text={currentTypingMessage}
                       onComplete={handleTypingComplete}
@@ -276,20 +287,21 @@ const ChatBot = () => {
                 </div>
               )}
 
+              {/* Enhanced Loading Animation */}
               {isLoading && (
-                <div className="text-center text-gray-400">
-                  <div className="animate-pulse flex items-center justify-center gap-2">
-                    <div className="w-2 h-2 bg-[#2997ff] rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-[#2997ff] rounded-full animate-bounce delay-100"></div>
-                    <div className="w-2 h-2 bg-[#2997ff] rounded-full animate-bounce delay-200"></div>
+                <div className="text-center text-gray-400 p-4">
+                  <div className="animate-pulse flex items-center justify-center gap-3">
+                    <div className="w-3 h-3 bg-gradient-to-r from-[#2997ff] to-[#2171b5] rounded-full animate-bounce"></div>
+                    <div className="w-3 h-3 bg-gradient-to-r from-[#2997ff] to-[#2171b5] rounded-full animate-bounce delay-100"></div>
+                    <div className="w-3 h-3 bg-gradient-to-r from-[#2997ff] to-[#2171b5] rounded-full animate-bounce delay-200"></div>
                   </div>
                 </div>
               )}
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Area */}
-            <div className="p-6 bg-[#1c1c1e]">
+            {/* Enhanced Input Area */}
+            <div className="p-6 bg-[#1c1c1e]/90 rounded-b-3xl border-t border-[#2997ff]/30">
               <div className="flex gap-4">
                 <input
                   ref={inputRef}
@@ -298,14 +310,14 @@ const ChatBot = () => {
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   placeholder="Ask about any feature, roadmap, or learning path..."
-                  className="flex-1 bg-[#2c2c2e] text-white border-none rounded-xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-[#2997ff] placeholder-gray-500 text-lg"
+                  className="flex-1 bg-[#2c2c2e] text-white border border-[#3c3c3e] rounded-xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-[#2997ff] placeholder-gray-500 text-lg shadow-inner transition-all duration-300"
                   disabled={isTyping}
                   autoFocus
                 />
                 <button
                   onClick={handleSendMessage}
                   disabled={isLoading || isTyping || !inputMessage.trim()}
-                  className="bg-[#2997ff] text-white px-6 rounded-xl hover:bg-[#2997ff]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+                  className="bg-gradient-to-r from-[#2997ff] to-[#2171b5] text-white px-8 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 font-medium shadow-lg hover:shadow-xl disabled:hover:shadow-none"
                 >
                   <span className="hidden sm:inline">Send</span>
                   <IoMdSend size={20} />
