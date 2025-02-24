@@ -11,7 +11,7 @@ import { BookmarksOverlay } from './BookmarksOverlay';
 // ArrowRight Icon Component
 
 // NavItem Component
-// eslint-disable-next-line react/prop-types
+ 
 const NavItem = ({ href, children }) => {
   const location = useLocation();
   const isActive = location.pathname === href;
