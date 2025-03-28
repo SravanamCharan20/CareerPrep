@@ -17,7 +17,12 @@ function MernProjects() {
 
   useEffect(() => {
     // Fetch the project data from the backend
-    fetch('/api/projects/mernprojects')
+    fetch(`${import.meta.env.VITE_API_URL}/api/projects/mernprojects`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      credentials: 'include'
+    })
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');

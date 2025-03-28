@@ -164,25 +164,21 @@ const ChatBot = () => {
     };
   }, [isOpen]);
 
-  const handleSendMessage = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!inputMessage.trim()) return;
 
-    const userMessage = {
-      role: 'user',
-      content: inputMessage
-    };
-
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedMessages));
-    
-    setInputMessage('');
-    setIsLoading(true);
-
     try {
-      const response = await axios.post('/api/chat', {
+      setIsLoading(true);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/chat`, {
         message: inputMessage,
-        includeLinks: true
+        history: messages
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        withCredentials: true
       });
 
       setIsLoading(false);
@@ -195,7 +191,7 @@ const ChatBot = () => {
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.'
       };
-      const finalMessages = [...updatedMessages, errorMessage];
+      const finalMessages = [...messages, errorMessage];
       setMessages(finalMessages);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(finalMessages));
       setIsLoading(false);
@@ -308,14 +304,14 @@ const ChatBot = () => {
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
                   placeholder="Ask about any feature, roadmap, or learning path..."
                   className="flex-1 bg-[#2c2c2e] text-white border border-[#3c3c3e] rounded-xl px-6 py-4 focus:outline-none focus:ring-2 focus:ring-[#2997ff] placeholder-gray-500 text-lg shadow-inner transition-all duration-300"
                   disabled={isTyping}
                   autoFocus
                 />
                 <button
-                  onClick={handleSendMessage}
+                  onClick={handleSubmit}
                   disabled={isLoading || isTyping || !inputMessage.trim()}
                   className="bg-gradient-to-r from-[#2997ff] to-[#2171b5] text-white px-8 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 font-medium shadow-lg hover:shadow-xl disabled:hover:shadow-none"
                 >

@@ -1,11 +1,16 @@
 import { motion } from 'framer-motion';
 import { User, Mail, Calendar, Edit, Camera, Code, Brain, Award, Book } from 'lucide-react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signOutStart, signOutSuccess, signOutFailure } from '../redux/userSlice';
 
 const Profile = () => {
     const { currentUser, userInteractions } = useSelector(state => state.user);
     const [isEditing, setIsEditing] = useState(false);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     if (!userInteractions) {
         return (
@@ -52,6 +57,75 @@ const Profile = () => {
             color: '#bf5af2'
         }
     ];
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            dispatch(updateUserStart());
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/update/${currentUser._id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+            if (data.success === false) {
+                dispatch(updateUserFailure(data.message));
+                return;
+            }
+            dispatch(updateUserSuccess(data));
+            toast.success('User updated successfully');
+        } catch (error) {
+            dispatch(updateUserFailure(error.message));
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        try {
+            dispatch(deleteUserStart());
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/delete/${currentUser._id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                credentials: 'include',
+            });
+            const data = await res.json();
+            if (data.success === false) {
+                dispatch(deleteUserFailure(data.message));
+                return;
+            }
+            dispatch(deleteUserSuccess(data));
+            navigate('/signin');
+        } catch (error) {
+            dispatch(deleteUserFailure(error.message));
+        }
+    };
+
+    const handleSignOut = async () => {
+        try {
+            dispatch(signOutStart());
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signout`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                credentials: 'include',
+            });
+            const data = await res.json();
+            if (data.success === false) {
+                dispatch(signOutFailure(data.message));
+                return;
+            }
+            dispatch(signOutSuccess(data));
+            navigate('/signin');
+        } catch (error) {
+            dispatch(signOutFailure(error.message));
+        }
+    };
 
     return (
         <div className="min-h-screen bg-black text-white pt-20">

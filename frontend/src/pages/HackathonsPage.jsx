@@ -139,11 +139,15 @@ const HackathonsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all"); // all, upcoming, past
 
-
   useEffect(() => {
     const fetchHackathons = async () => {
       try {
-        const response = await fetch("/api/hackathons/fetch-hackathons");
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/hackathons/fetch-hackathons`, {
+          headers: {
+            'Accept': 'application/json',
+          },
+          credentials: 'include'
+        });
         const data = await response.json();
         setHackathons(data);
       } catch (error) {

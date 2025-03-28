@@ -25,22 +25,24 @@ const Signup = () => {
     e.preventDefault();
     try {
       dispatch(signUpStart());
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.message || "Signup failed");
+        throw new Error(data.message || "Registration failed");
       }
 
       dispatch(signUpSuccess(data));
-      navigate("/signin");
+      navigate("/");
     } catch (err) {
       dispatch(signUpFailure(err.message));
     }

@@ -26,11 +26,13 @@ const Signin = () => {
     e.preventDefault();
     try {
       dispatch(signInStart());
-      const res = await fetch("/api/auth/signin", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 

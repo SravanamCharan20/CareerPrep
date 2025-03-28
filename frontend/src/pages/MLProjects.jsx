@@ -17,7 +17,12 @@ function MLProjects() {
 
   useEffect(() => {
     // Fetch the project data from the backend
-    fetch('/api/projects/mlprojects')
+    fetch(`${import.meta.env.VITE_API_URL}/api/projects/mlprojects`, {
+      headers: {
+        'Accept': 'application/json',
+      },
+      credentials: 'include'
+    })
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
