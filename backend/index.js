@@ -1,6 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
 import userRoute from "./routes/user.route.js";
 import authRoute from "./routes/auth.route.js";
 import cronJob from './utils/cronJob.js'; 
@@ -11,6 +12,14 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 dotenv.config();
 
 const app = express();
+
+// CORS configuration
+app.use(cors({
+    origin: ['https://career-prep-ten.vercel.app', 'http://localhost:5173'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
 
 // middleware
 app.use(express.json());

@@ -16,13 +16,22 @@ export default function OAuth() {
             const result = await signInWithPopup(auth, provider)
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/google`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                credentials: 'include',
                 body: JSON.stringify({
                     name: result.user.displayName,
                     email: result.user.email,
                     photo: result.user.photoURL
                 })
             })
+            
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`)
+            }
+            
             const data = await res.json()
             console.log(data)
             dispatch(signInSuccess(data))

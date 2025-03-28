@@ -50,7 +50,12 @@ export const signin = async (req, res, next) => {
       { expiresIn: '1h' }
     );
 
-    res.cookie('access_token', token, { httpOnly: true }).status(200).json({
+    res.cookie('access_token', token, { 
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none',
+      domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
+    }).status(200).json({
       _id: user._id,
       username: user.username,
       email: user.email,
@@ -68,7 +73,13 @@ export const googleAuth = async (req, res, next) => {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
       const {password, ...rest} = user._doc
       const expiresIn = new Date(Date.now() + 1000 * 60 * 60 * 24)
-      res.cookie('access_token', token, { httpOnly: true, expires: expiresIn }).status(200).json(rest)
+      res.cookie('access_token', token, { 
+        httpOnly: true, 
+        expires: expiresIn,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
+      }).status(200).json(rest)
     }
     else {
       const generatedPassword = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
@@ -83,7 +94,13 @@ export const googleAuth = async (req, res, next) => {
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
       const {password, ...rest} = newUser._doc
       const expiresIn = new Date(Date.now() + 1000 * 60 * 60 * 24)
-      res.cookie('access_token', token, { httpOnly: true, expires: expiresIn }).status(200).json(rest)
+      res.cookie('access_token', token, { 
+        httpOnly: true, 
+        expires: expiresIn,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'none',
+        domain: process.env.NODE_ENV === 'production' ? '.railway.app' : 'localhost'
+      }).status(200).json(rest)
     }
   } catch (error) {
     next(error)
