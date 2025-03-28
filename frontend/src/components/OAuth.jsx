@@ -40,7 +40,7 @@ export default function OAuth() {
             whileTap={{ scale: 0.98 }}
             className="w-full py-3 border border-[#424245] rounded-lg text-white hover:border-[#2997ff] transition-colors flex items-center justify-center space-x-2"
           >
-            <img src="../../public/images/google-logo.webp" alt="Google" className="w-5 h-5" />
+            <img src="/images/google-logo.webp" alt="Google" className="w-5 h-5" />
             <span>Continue with Google</span>
           </motion.button>
     </div>
