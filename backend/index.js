@@ -50,7 +50,7 @@ app.post('/api/chat', async (req, res) => {
   try {
     const { message } = req.body;
     
-    const model = genAI.getGenerativeModel({ model: "gemini-pro"});
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash"});
 
     // Updated context with better response formatting instructions
     const context = `You are an AI assistant for a comprehensive tech learning platform. 
