@@ -12,8 +12,9 @@ export default defineConfig({
   server:{
     proxy:{
       '/api':{
-        target:'http://localhost:8888',
-        secure:false
+        target:'https://careerprep-production-a698.up.railway.app',
+        changeOrigin: true,
+        secure:false,
       }
     }
   }
