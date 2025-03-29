@@ -26,7 +26,7 @@ const Signin = () => {
     e.preventDefault();
     try {
       dispatch(signInStart());
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signin`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/signin`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -61,7 +61,7 @@ const Profile = () => {
         e.preventDefault();
         try {
             dispatch(updateUserStart());
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/update/${currentUser._id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/user/update/${currentUser._id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ const Profile = () => {
     const handleDeleteUser = async () => {
         try {
             dispatch(deleteUserStart());
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/user/delete/${currentUser._id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/user/delete/${currentUser._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -107,7 +107,7 @@ const Profile = () => {
     const handleSignOut = async () => {
         try {
             dispatch(signOutStart());
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/signout`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/signout`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',

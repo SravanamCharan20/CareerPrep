@@ -17,7 +17,7 @@ function MernProjects() {
 
   useEffect(() => {
     // Fetch the project data from the backend
-    fetch(`${import.meta.env.VITE_API_URL}/api/projects/mernprojects`, {
+    fetch(`${import.meta.env.VITE_API_URL}/projects/mernprojects`, {
       headers: {
         'Accept': 'application/json',
       },

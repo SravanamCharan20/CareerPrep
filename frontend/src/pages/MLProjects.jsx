@@ -17,7 +17,7 @@ function MLProjects() {
 
   useEffect(() => {
     // Fetch the project data from the backend
-    fetch(`${import.meta.env.VITE_API_URL}/api/projects/mlprojects`, {
+    fetch(`${import.meta.env.VITE_API_URL}/projects/mlprojects`, {
       headers: {
         'Accept': 'application/json',
       },

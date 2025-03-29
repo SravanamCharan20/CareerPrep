@@ -142,7 +142,7 @@ const HackathonsPage = () => {
   useEffect(() => {
     const fetchHackathons = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/hackathons/fetch-hackathons`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/hackathons/fetch-hackathons`, {
           headers: {
             'Accept': 'application/json',
           },
