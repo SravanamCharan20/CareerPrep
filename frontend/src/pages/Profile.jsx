@@ -3,7 +3,6 @@ import { User, Mail, Calendar, Edit, Camera, Code, Brain, Award, Book } from 'lu
 import { useSelector, useDispatch } from 'react-redux';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
 import { updateUserStart, updateUserSuccess, updateUserFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signOutStart, signOutSuccess, signOutFailure } from '../redux/userSlice';
 
 const Profile = () => {
@@ -77,7 +76,7 @@ const Profile = () => {
                 return;
             }
             dispatch(updateUserSuccess(data));
-            toast.success('User updated successfully');
+            console.log('User updated successfully');
         } catch (error) {
             dispatch(updateUserFailure(error.message));
         }
